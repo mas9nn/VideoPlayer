@@ -104,6 +104,7 @@ public class MainPageItems implements Parcelable {
     }
 
     public boolean equals(Object ob){
+        views = ((MainPageItems)ob).getViews();
         if(this==ob)
             return true;
         if(!(ob instanceof MainPageItems))

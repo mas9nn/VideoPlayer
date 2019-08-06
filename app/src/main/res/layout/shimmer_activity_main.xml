@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:paddingLeft="20dp"
+    android:layout_marginTop="10dp"
+    android:paddingRight="20dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/more"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:src="@drawable/ic_keyboard_arrow_down_black_24dp"
+                android:tint="@android:color/black"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/discription"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:text="Artefact - 99"
+                android:background="@drawable/gray_back"
+                android:textColor="@color/gray"
+                android:textAllCaps="false"
+                android:textSize="17dp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toLeftOf="@id/more"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
+            <ImageView
+                android:id="@+id/views"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:src="@drawable/ic_person_black_24dp"
+                android:tint="@android:color/black"
+                app:layout_constraintLeft_toLeftOf="@id/discription"
+                app:layout_constraintTop_toBottomOf="@id/discription" />
+
+            <TextView
+                android:id="@+id/count_of_views"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:background="@drawable/gray_back"
+                android:textColor="@color/gray"
+                android:text="999 999"
+                android:textSize="15dp"
+                app:layout_constraintBottom_toBottomOf="@id/views"
+                app:layout_constraintLeft_toRightOf="@id/views"
+                app:layout_constraintTop_toTopOf="@id/views" />
+
+            <ImageButton
+                android:id="@+id/like"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:background="@android:color/transparent"
+                android:src="@drawable/ic_favorite_black"
+                app:layout_constraintLeft_toLeftOf="@id/views"
+                app:layout_constraintTop_toBottomOf="@id/views" />
+
+            <TextView
+                android:id="@+id/num_of_like"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="9dp"
+                android:background="@drawable/gray_back"
+                android:textColor="@color/gray"
+                android:text="210030039"
+                app:layout_constraintBottom_toBottomOf="@id/like"
+                app:layout_constraintLeft_toRightOf="@id/like"
+                app:layout_constraintTop_toTopOf="@id/like" />
+
+            <ImageButton
+                android:id="@+id/dislick"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="15dp"
+                android:background="@android:color/transparent"
+                android:src="@drawable/ic_keyboard_capslock_black_24dp"
+                app:layout_constraintLeft_toRightOf="@id/num_of_like"
+                app:layout_constraintTop_toBottomOf="@id/views" />
+
+            <TextView
+                android:id="@+id/num_of_dis"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="9dp"
+                android:background="@drawable/gray_back"
+                android:textColor="@color/gray"
+                android:text="210030039"
+                app:layout_constraintBottom_toBottomOf="@id/dislick"
+                app:layout_constraintLeft_toRightOf="@id/dislick"
+                app:layout_constraintTop_toTopOf="@id/dislick" />
+
+            <ImageButton
+                android:id="@+id/share"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:src="@drawable/ic_share_black_24dp"
+                app:layout_constraintBottom_toBottomOf="@id/like"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="@id/like" />
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="20dp"
+                android:background="@android:color/transparent"
+                android:src="@drawable/ic_add_black_24dp"
+                app:layout_constraintBottom_toBottomOf="@id/like"
+                app:layout_constraintRight_toLeftOf="@id/share"
+                app:layout_constraintTop_toTopOf="@id/like" />
+
+            <View
+                android:id="@+id/divide"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="6dp"
+                android:background="@android:color/darker_gray"
+                app:layout_constraintTop_toBottomOf="@id/share" />
+
+            <ImageView
+                android:id="@+id/channel_logo"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/gray_back"
+                android:textColor="@color/gray"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/divide" />
+
+            <Button
+                android:id="@+id/follow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="15dp"
+                android:background="@drawable/gray_back"
+                android:textColor="@color/gray"
+                android:paddingRight="15dp"
+                android:text="Подписаться"
+                app:layout_constraintBottom_toBottomOf="@id/channel_logo"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="@id/channel_logo" />
+
+            <TextView
+                android:id="@+id/name_of_channel"
+                android:background="@drawable/gray_back"
+                android:textColor="@color/gray"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="13dp"
+                android:text="Make It Music"
+                android:textStyle="bold"
+                app:layout_constraintLeft_toRightOf="@id/channel_logo"
+                app:layout_constraintRight_toLeftOf="@+id/follow"
+                app:layout_constraintTop_toTopOf="@id/channel_logo" />
+
+            <TextView
+                android:id="@+id/followers"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="13dp"
+                android:background="@drawable/gray_back"
+                android:textColor="@color/gray"
+                android:text="298 подписчиков"
+                app:layout_constraintBottom_toBottomOf="@id/follow"
+                app:layout_constraintLeft_toRightOf="@id/channel_logo"
+                app:layout_constraintRight_toLeftOf="@+id/follow"
+                app:layout_constraintTop_toBottomOf="@id/name_of_channel" />
+
+            <View
+                android:id="@+id/divide3"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="10dp"
+                android:background="@android:color/darker_gray"
+                app:layout_constraintTop_toBottomOf="@id/channel_logo" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/hidable"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/channel_logo">
+
+                <TextView
+                    android:id="@+id/date"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="15dp"
+                    android:text="24 Июля 2019"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/name_of_video_bottom"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="Artefact - 99"
+                    app:layout_constraintLeft_toLeftOf="@id/date"
+                    app:layout_constraintTop_toBottomOf="@id/date" />
+
+                <TextView
+                    android:id="@+id/category"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="Категория"
+                    android:textStyle="bold"
+                    app:layout_constraintLeft_toLeftOf="@id/name_of_video_bottom"
+                    app:layout_constraintTop_toBottomOf="@id/name_of_video_bottom" />
+
+                <TextView
+                    android:id="@+id/name_of_category"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginTop="12dp"
+                    android:text="Музыка и развлечения"
+                    app:layout_constraintLeft_toRightOf="@id/category"
+                    app:layout_constraintTop_toBottomOf="@id/name_of_video_bottom" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <include layout="@layout/shimmer_small_items"/>
+        <include layout="@layout/shimmer_small_items"/>
+        <include layout="@layout/shimmer_small_items"/>
+        <include layout="@layout/shimmer_small_items"/>
+        <include layout="@layout/shimmer_small_items"/>
+        <include layout="@layout/shimmer_small_items"/>
+        <include layout="@layout/shimmer_small_items"/>
+
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

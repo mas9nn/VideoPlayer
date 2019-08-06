@@ -40,8 +40,8 @@
             <TextView
                 android:id="@+id/title_tol"
                 android:layout_width="wrap_content"
-                android:text=""
                 android:layout_height="wrap_content"
+                android:text=""
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -59,10 +59,10 @@
             <ImageView
                 android:id="@+id/clear_btn"
                 android:layout_width="wrap_content"
-                android:visibility="gone"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="16dp"
                 android:src="@drawable/ic_clear_black_24dp"
+                android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintRight_toLeftOf="@id/search_button"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -71,15 +71,15 @@
                 android:id="@+id/searcher_edit_text"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:hint="Поиск"
-                android:visibility="gone"
-                android:inputType="textAutoComplete"
                 android:background="@null"
+                android:hint="Поиск"
+                android:inputType="textAutoComplete"
                 android:textSize="17sp"
-                app:layout_constraintTop_toTopOf="parent"
+                android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="@id/title_tol"
                 app:layout_constraintRight_toLeftOf="@id/clear_btn"
-                app:layout_constraintLeft_toLeftOf="@id/title_tol" />
+                app:layout_constraintTop_toTopOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -90,8 +90,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@id/linear"
-        app:layout_constraintTop_toBottomOf="@id/toolbar"
-        ></com.example.videoplayer.ViewPager.CustomViewPager>
+        app:layout_constraintTop_toBottomOf="@id/toolbar"></com.example.videoplayer.ViewPager.CustomViewPager>
 
     <FrameLayout
         android:id="@+id/searcher"
@@ -108,7 +107,7 @@
         android:id="@+id/draggable_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:visibility="gone"
+        android:visibility="visible"
         draggable_view:bottom_view_id="@+id/iv_thumbnail"
         draggable_view:enable_minimized_horizontal_alpha_effect="false"
         draggable_view:layout_constraintBottom_toBottomOf="parent"
@@ -128,6 +127,7 @@
 
 
             <androidx.core.widget.NestedScrollView
+                android:id="@+id/nested_scroll"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
@@ -414,6 +414,20 @@
             </androidx.core.widget.NestedScrollView>
 
             <include layout="@layout/bottom_sheet" />
+
+            <com.facebook.shimmer.ShimmerFrameLayout
+                android:background="@android:color/white"
+                android:id="@+id/shimmer"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:shimmer_duration="800"
+                app:shimmer_repeat_delay="1">
+
+                <include layout="@layout/shimmer_activity_main" />
+
+            </com.facebook.shimmer.ShimmerFrameLayout>
+
 
         </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
 import androidx.annotation.Nullable;
 
 import androidx.fragment.app.Fragment;
@@ -23,6 +24,7 @@ import com.example.videoplayer.Interfaces.ItemSelecListener;
 import com.example.videoplayer.MainActivity;
 import com.example.videoplayer.Models.MainPageItems;
 import com.example.videoplayer.R;
+import com.facebook.shimmer.ShimmerFrameLayout;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,6 +40,7 @@ public class MainFragment extends Fragment implements ItemSelecListener, SwipeRe
     ArrayList<MainPageItems> items = new ArrayList<>();
     ItemSelecListener itemSelecListener;
     MainPageAdapter adapter;
+    ShimmerFrameLayout shimmer;
     SwipeRefreshLayout mSwipeRefreshLayout;
     int count = 0;
 
@@ -55,7 +58,8 @@ public class MainFragment extends Fragment implements ItemSelecListener, SwipeRe
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_main, null);
         itemSelecListener = this;
-
+        shimmer = (ShimmerFrameLayout) v.findViewById(R.id.shimmer_view_container);
+        shimmer.startShimmer();
         recyclerView = v.findViewById(R.id.recycler);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mSwipeRefreshLayout = v.findViewById(R.id.swipe_container);
@@ -70,21 +74,24 @@ public class MainFragment extends Fragment implements ItemSelecListener, SwipeRe
 
             @Override
             public void run() {
-
-                if (mSwipeRefreshLayout != null&count==0) {
-                    mSwipeRefreshLayout.setRefreshing(true);
-                    count++;
-                }
-
-                // TODO Fetching data from server
                 try {
                     sendWorkPostRequest();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+                if (mSwipeRefreshLayout != null & count == 0) {
+                    mSwipeRefreshLayout.setRefreshing(false);
+                    shimmer.setVisibility(View.VISIBLE);
+                    recyclerView.setVisibility(View.GONE);
+                    count++;
+                }
+
+                // TODO Fetching data from server
+
             }
         });
-        Log.d("asdasd","save");
+
+        Log.d("asdasd", "save");
         if (savedInstanceState != null) {
             //Restore the fragment's state here
 
@@ -115,18 +122,18 @@ public class MainFragment extends Fragment implements ItemSelecListener, SwipeRe
 
     @Override
     public void onResume() {
-        Log.d("asdasd","assda");
+        Log.d("asdasd", "assda");
         super.onResume();
     }
 
     @Override
     public void onPause() {
-        Log.d("asdasd","pau");
+        Log.d("asdasd", "pau");
         super.onPause();
     }
 
     private void sendWorkPostRequest() throws JSONException {
-        String requestUrl = "https://video.orzu.org/api/v1.0/?type=get_videos&limit=5"+count;
+        String requestUrl = "https://video.orzu.org/api/v1.0/?type=get_videos&limit=5" + count;
         Log.d("Response", requestUrl);
         StringRequest stringRequest = new StringRequest(Request.Method.POST, requestUrl, new Response.Listener<String>() {
             @Override
@@ -153,11 +160,15 @@ public class MainFragment extends Fragment implements ItemSelecListener, SwipeRe
                             if (!items.contains(pageItems)) {
                                 items.add(pageItems);
                             }
+                            adapter.notifyDataSetChanged();
                             mSwipeRefreshLayout.setRefreshing(false);
+
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
                     }
+                    shimmer.setVisibility(View.GONE);
+                    recyclerView.setVisibility(View.VISIBLE);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -167,6 +178,8 @@ public class MainFragment extends Fragment implements ItemSelecListener, SwipeRe
             public void onErrorResponse(VolleyError error) {
                 error.printStackTrace(); //log the error resulting from the request for diagnosis/debugging
                 mSwipeRefreshLayout.setRefreshing(false);
+                shimmer.setVisibility(View.VISIBLE);
+                recyclerView.setVisibility(View.GONE);
             }
         }) {
             @Override
@@ -184,7 +197,11 @@ public class MainFragment extends Fragment implements ItemSelecListener, SwipeRe
     @Override
     public void onRefresh() {
         try {
+            mSwipeRefreshLayout.setRefreshing(false);
+            shimmer.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.GONE);
             count++;
+            items.clear();
             sendWorkPostRequest();
             adapter.notifyDataSetChanged();
         } catch (JSONException e) {

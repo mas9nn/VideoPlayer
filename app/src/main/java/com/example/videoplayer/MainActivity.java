@@ -1,6 +1,7 @@
 package com.example.videoplayer;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
@@ -29,6 +30,7 @@ import com.example.videoplayer.Interfaces.ItemSelecListener;
 import com.example.videoplayer.Models.MainPageItems;
 
 import com.example.videoplayer.ViewPager.CustomViewPager;
+import com.facebook.shimmer.ShimmerFrameLayout;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayerFactory;
@@ -83,6 +85,7 @@ import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -172,7 +175,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
 
     @Override
     public void onBackPressed() {
-        Log.d("asd", searcher.getVisibility() + "");
+        Log.d("asd", searcher.getVisibility() + " " + panel.isClosed());
         int orientation = getResources().getConfiguration().orientation;
         if (panel.isMaximized()) {
             if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
@@ -180,13 +183,15 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             } else {
                 panel.minimize();
             }
-        } else if (searcher.getVisibility() == View.VISIBLE) {
-            Log.d("asd", "vis");
-            searcher.setVisibility(View.GONE);
         } else if (panel.isMinimized()) {
             panel.closeToLeft();
+        } else if (panel.isClosed()) {
+            if(searcher.getVisibility() == View.VISIBLE) {
+                Log.d("asd", "back");
+                menu.performIdentifierAction(android.R.id.home, 0);
+            }
         } else {
-            super.onBackPressed();
+            // super.onBackPressed();
         }
     }
 
@@ -198,7 +203,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
     EditText searchView;
     double topView;
     CustomViewPager viewPager;
-
+    ShimmerFrameLayout shimmer;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -231,7 +236,8 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         name_of_category = findViewById(R.id.name_of_category);
         progressBar = findViewById(R.id.bar);
         bottom_constraint = findViewById(R.id.bottom_constraint);
-
+        shimmer = findViewById(R.id.shimmer);
+        shimmer.startShimmer();
         like = findViewById(R.id.like);
         dislike = findViewById(R.id.dislick);
         follow = findViewById(R.id.follow);
@@ -311,7 +317,10 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                         searchView.setText("");
                     }
                 });
-                searchView.callOnClick();
+                searchView.setFocusableInTouchMode(true);
+                searchView.requestFocus();
+                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
                 searcher.setVisibility(View.VISIBLE);
             }
         });
@@ -430,10 +439,12 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
 
             @Override
             public void onMinimized() {
-                exoPlayerView.hideController();
-                panel.setClickToMaximizeEnabled(true);
-                panel.setTopViewHeight((int) topView);
-                Log.d("asd", panel.getTopView() + "");
+                if (exoPlayerView != null) {
+                    exoPlayerView.hideController();
+                    panel.setClickToMaximizeEnabled(true);
+                    panel.setTopViewHeight((int) topView);
+                    Log.d("asd", panel.getTopView() + "");
+                }
             }
 
             @Override
@@ -484,6 +495,9 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             cancel.setVisibility(View.GONE);
             getSupportActionBar().setDisplayHomeAsUpEnabled(false);
             getSupportActionBar().setDisplayShowHomeEnabled(false);
+            InputMethodManager imm = (InputMethodManager) getSystemService(
+                    Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
         }
         if (item.getItemId() == R.id.action_micro) {
             final Dialog dialog = new Dialog(this);
@@ -496,8 +510,9 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
     public void MaximizePanel(String url, List<MainPageItems> items, int position) throws JSONException {
         hide.setImageResource(R.drawable.ic_keyboard_arrow_down_black_24dp);
         hidable.setVisibility(View.GONE);
-        progressBar.setVisibility(View.VISIBLE);
         bottom_constraint.setVisibility(View.INVISIBLE);
+        shimmer.setVisibility(View.VISIBLE);
+        layoutBottomSheet.setVisibility(View.GONE);
         panel.setVisibility(View.VISIBLE);
         id = items.get(position).getId();
         Log.d("items", items.size() + " " + position);
@@ -668,6 +683,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                 try {
                     if (ids.size() != 1) {
                         requstByVideo(ids.get(player.getCurrentWindowIndex()));
+                        player.setPlayWhenReady(true);
                         Log.d("ids", ids.get(player.getCurrentWindowIndex()) + "");
                     }
                 } catch (JSONException e) {
@@ -852,6 +868,8 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                     }
                     progressBar.setVisibility(View.GONE);
                     bottom_constraint.setVisibility(View.VISIBLE);
+                    shimmer.setVisibility(View.GONE);
+                    layoutBottomSheet.setVisibility(View.VISIBLE);
                     JSONArray suggested = data.getJSONArray("suggested_videos");
                     Log.d("suggested", suggested + "");
                     if (suggested.length() != 0) {

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/white"
+    android:padding="15dp">
+
+    <ImageView
+        android:id="@+id/preview"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:background="@color/gray"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/duration"
+        android:layout_width="40dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:background="@color/gray"
+        android:textColor="@color/gray"
+        app:layout_constraintBottom_toBottomOf="@id/preview"
+        app:layout_constraintRight_toRightOf="@id/preview" />
+
+    <ImageButton
+        android:id="@+id/vert"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:src="@drawable/ic_more_vert_black_24dp"
+        app:layout_constraintRight_toRightOf="@id/preview"
+        app:layout_constraintTop_toBottomOf="@id/preview" />
+
+    <TextView
+        android:id="@+id/name_of_video"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="3dp"
+        android:background="@drawable/gray_back"
+        android:text="asdsahfhashdjsahdjkashdkahsdjkshajhofhhad"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:textColor="@color/gray"
+        app:layout_constraintRight_toLeftOf="@+id/vert"
+        app:layout_constraintTop_toBottomOf="@+id/preview" />
+
+    <TextView
+        android:layout_marginTop="3dp"
+        android:id="@+id/channel_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="FUNBOX"
+        android:background="@drawable/gray_back"
+        android:textColor="@color/gray"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/name_of_video" />
+
+    <ImageView
+        android:id="@+id/viewers"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:src="@drawable/ic_person_black_24dp"
+        android:tint="@android:color/darker_gray"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/channel_name" />
+
+    <TextView
+        android:id="@+id/count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:text="1500"
+        android:textColor="@color/gray"
+        android:background="@drawable/gray_back"
+        app:layout_constraintBottom_toBottomOf="@id/viewers"
+        app:layout_constraintLeft_toRightOf="@id/viewers"
+        app:layout_constraintTop_toBottomOf="@id/channel_name" />
+
+    <View
+        android:id="@+id/view"
+        android:layout_width="1dp"
+        android:layout_height="0dp"
+        android:layout_marginLeft="5dp"
+        android:background="@android:color/darker_gray"
+        app:layout_constraintBottom_toBottomOf="@id/count"
+        app:layout_constraintLeft_toRightOf="@id/count"
+        app:layout_constraintTop_toTopOf="@id/count" />
+
+    <TextView
+        android:id="@+id/day"
+        android:layout_marginLeft="4dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/gray_back"
+        android:text="18 chasov nazad"
+        android:textColor="@color/gray"
+        app:layout_constraintBottom_toBottomOf="@id/viewers"
+        app:layout_constraintLeft_toRightOf="@id/view"
+        app:layout_constraintTop_toBottomOf="@id/channel_name"
+        app:layout_constraintVertical_bias="0.6" />
+</androidx.constraintlayout.widget.ConstraintLayout>
