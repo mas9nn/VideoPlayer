@@ -5,8 +5,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
-
 import androidx.annotation.Nullable;
 
 import androidx.fragment.app.Fragment;
@@ -18,7 +16,6 @@ import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.videoplayer.Adapters.MainPageAdapter;
@@ -33,16 +30,25 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 
 public class MainFragment extends Fragment implements ItemSelecListener, SwipeRefreshLayout.OnRefreshListener {
     RecyclerView recyclerView;
-    List<MainPageItems> items = new ArrayList<>();
+    ArrayList<MainPageItems> items = new ArrayList<>();
     ItemSelecListener itemSelecListener;
-    MainPageAdapter adapter ;
+    MainPageAdapter adapter;
     SwipeRefreshLayout mSwipeRefreshLayout;
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        if (savedInstanceState != null) {
+            //Restore the fragment's state here
+            Log.d("asdasd","assda");
+        }
+        super.onActivityCreated(savedInstanceState);
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_main, null);
@@ -53,17 +59,18 @@ public class MainFragment extends Fragment implements ItemSelecListener, SwipeRe
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mSwipeRefreshLayout = v.findViewById(R.id.swipe_container);
         mSwipeRefreshLayout.setOnRefreshListener(this);
-//        mSwipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary,
         mSwipeRefreshLayout.setColorSchemeResources(R.color.colorAccent,
                 android.R.color.holo_green_dark,
                 android.R.color.holo_orange_dark,
                 android.R.color.holo_blue_dark);
+        adapter = new MainPageAdapter(items, getContext(), itemSelecListener);
+        recyclerView.setAdapter(adapter);
         mSwipeRefreshLayout.post(new Runnable() {
 
             @Override
             public void run() {
 
-                if(mSwipeRefreshLayout != null) {
+                if (mSwipeRefreshLayout != null) {
                     mSwipeRefreshLayout.setRefreshing(true);
                 }
                 // TODO Fetching data from server
@@ -79,16 +86,15 @@ public class MainFragment extends Fragment implements ItemSelecListener, SwipeRe
 
     @Override
     public void onStop() {
+
         super.onStop();
     }
-
-
 
     @Override
     public void onItemSelectedListener(View view, int position) {
         try {
-            ((MainActivity)getActivity()).changePostion();
-            ((MainActivity)getActivity()).MaximizePanel(items.get(position).getUrl(),items,position);
+            ((MainActivity) getActivity()).changePostion();
+            ((MainActivity) getActivity()).MaximizePanel(items.get(position).getUrl(), items, position);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -99,25 +105,20 @@ public class MainFragment extends Fragment implements ItemSelecListener, SwipeRe
 
     }
 
-    public void setEnableRecycler(int bool){
-        recyclerView.setVisibility(bool);
-    }
-
     private void sendWorkPostRequest() throws JSONException {
-        items.clear();
         Log.d("Response", "asd");
-        String requestUrl ="https://video.orzu.org/api/v1.0/?type=get_videos&limit=50";
+        String requestUrl = "https://video.orzu.org/api/v1.0/?type=get_videos&limit=50";
         StringRequest stringRequest = new StringRequest(Request.Method.POST, requestUrl, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                Log.e("Respose", ""+response); //the response contains the result from the server, a json string or any other object returned by your server
-                try{
-                    JSONObject j= new JSONObject(response);
-                    JSONObject data= j.getJSONObject("data");
+                Log.e("Respose", "" + response); //the response contains the result from the server, a json string or any other object returned by your server
+                try {
+                    JSONObject j = new JSONObject(response);
+                    JSONObject data = j.getJSONObject("data");
                     JSONArray featured = data.getJSONArray("featured");
                     for (int i = 0; i < featured.length(); i++) {
                         try {
-                            Log.d("Response", featured.get(i)+"");
+                            Log.d("Response", featured.get(i) + "");
                             JSONObject object = featured.getJSONObject(i);
                             JSONObject owner = object.getJSONObject("owner");
                             MainPageItems pageItems = new MainPageItems();
@@ -129,16 +130,15 @@ public class MainFragment extends Fragment implements ItemSelecListener, SwipeRe
                             pageItems.setViews(object.getString("views"));
                             pageItems.setUrl(object.getString("video_location"));
                             pageItems.setId(object.getString("video_id"));
-                            items.add(pageItems);
-                            adapter = new MainPageAdapter(items, getContext(),itemSelecListener );
-                            recyclerView.setAdapter(adapter);
-                            adapter.notifyDataSetChanged();
+                            if (!items.contains(pageItems)) {
+                                items.add(pageItems);
+                            }
                             mSwipeRefreshLayout.setRefreshing(false);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
                     }
-                }catch (JSONException e) {
+                } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
@@ -148,11 +148,11 @@ public class MainFragment extends Fragment implements ItemSelecListener, SwipeRe
                 error.printStackTrace(); //log the error resulting from the request for diagnosis/debugging
                 mSwipeRefreshLayout.setRefreshing(false);
             }
-        }){
+        }) {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> postMap = new HashMap<>();
-                postMap.put("server_key","e39111734a4e6a21dd442887dd5112c8" );
+                postMap.put("server_key", "e39111734a4e6a21dd442887dd5112c8");
                 //..... Add as many key value pairs in the map as necessary for your request
                 return postMap;
             }
@@ -165,6 +165,7 @@ public class MainFragment extends Fragment implements ItemSelecListener, SwipeRe
     public void onRefresh() {
         try {
             sendWorkPostRequest();
+            adapter.notifyDataSetChanged();
         } catch (JSONException e) {
             e.printStackTrace();
         }

@@ -178,6 +178,10 @@ public class DraggableView extends RelativeLayout {
         transformer.setMarginRight(topFragmentMarginRight);
     }
 
+    public int getTopViewMarginRight() {
+       return transformer.getMarginRight();
+    }
+
     /**
      * Configure the dragView margin bottom applied when the dragView is minimized.
      */

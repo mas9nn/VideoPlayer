@@ -1,13 +1,16 @@
 package com.example.videoplayer.Models;
 
-public class MainPageItems {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class MainPageItems implements Parcelable {
     String preview_image, duration, name, channel_name, views, days;
-    String url,id;
+    String url, id;
 
     public MainPageItems() {
     }
 
-    public MainPageItems(String preview_image, String duration, String name, String channel_name, String views, String days,String url,String id) {
+    public MainPageItems(String preview_image, String duration, String name, String channel_name, String views, String days, String url, String id) {
         this.preview_image = preview_image;
         this.duration = duration;
         this.name = name;
@@ -16,6 +19,17 @@ public class MainPageItems {
         this.days = days;
         this.url = url;
         this.id = id;
+    }
+
+    public MainPageItems(Parcel in) {
+        preview_image = in.readString();
+        duration = in.readString();
+        name = in.readString();
+        channel_name = in.readString();
+        views = in.readString();
+        days = in.readString();
+        url = in.readString();
+        id = in.readString();
     }
 
     public String getId() {
@@ -81,4 +95,31 @@ public class MainPageItems {
     public void setDays(String days) {
         this.days = days;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(preview_image);
+        parcel.writeString(duration);
+        parcel.writeString(name);
+        parcel.writeString(channel_name);
+        parcel.writeString(views);
+        parcel.writeString(days);
+        parcel.writeString(url);
+        parcel.writeString(id);
+    }
+
+    public static final Parcelable.Creator<MainPageItems> CREATOR = new Parcelable.Creator<MainPageItems>() {
+        public MainPageItems createFromParcel(Parcel in) {
+            return new MainPageItems(in);
+        }
+
+        public MainPageItems[] newArray(int size) {
+            return new MainPageItems[size];
+        }
+    };
 }

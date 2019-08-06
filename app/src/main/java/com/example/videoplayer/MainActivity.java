@@ -6,7 +6,6 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Point;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -17,6 +16,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.videoplayer.Adapters.PanelAdapter;
+import com.example.videoplayer.Adapters.ViewPagerAdapter;
 import com.example.videoplayer.Draggable.DraggableListener;
 import com.example.videoplayer.Draggable.DraggableView;
 import com.example.videoplayer.Fragments.CategoryFragment;
@@ -28,6 +28,7 @@ import com.example.videoplayer.Fragments.SearchFragment;
 import com.example.videoplayer.Interfaces.ItemSelecListener;
 import com.example.videoplayer.Models.MainPageItems;
 
+import com.example.videoplayer.ViewPager.CustomViewPager;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayerFactory;
@@ -60,14 +61,12 @@ import com.squareup.picasso.Picasso;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatDelegate;
-import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.FragmentManager;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.transition.Fade;
 
 import android.os.Handler;
 import android.provider.Settings;
@@ -113,16 +112,16 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.main:
-                    fragmentManager.beginTransaction().replace(R.id.main_container, new MainFragment()).commit();
+                    viewPager.setCurrentItem(0);
                     return true;
                 case R.id.chanels:
-                    fragmentManager.beginTransaction().replace(R.id.main_container, new CategoryFragment()).commit();
+                    viewPager.setCurrentItem(1);
                     return true;
                 case R.id.following:
-                    fragmentManager.beginTransaction().replace(R.id.main_container, new FollowedFragment()).commit();
+                    viewPager.setCurrentItem(2);
                     return true;
                 case R.id.account:
-                    fragmentManager.beginTransaction().replace(R.id.main_container, new LoginFragment()).commit();
+                    viewPager.setCurrentItem(3);
                     return true;
             }
             return false;
@@ -136,7 +135,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
 
     RecyclerView recyclerInPanel;
     ImageButton like, dislike;
-    ImageView hide,cancel;
+    ImageView hide, cancel;
     Button follow;
     List<MainPageItems> items = new ArrayList<>();
     List<MainPageItems> suggestions = new ArrayList<>();
@@ -195,12 +194,21 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
     BottomSheetBehavior sheetBehavior;
     EditText searchView;
     double topView;
+    CustomViewPager viewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
+        viewPager = (CustomViewPager) findViewById(R.id.main_container);
+        ViewPagerAdapter adapter = new ViewPagerAdapter(MainActivity.this.getSupportFragmentManager());
+        adapter.addFragment(new MainFragment(), "MainFragment");
+        adapter.addFragment(new CategoryFragment(), "CategoryFragment");
+        adapter.addFragment(new FollowedFragment(), "FollowedFragment");
+        adapter.addFragment(new LoginFragment(), "LoginFragment");
+        viewPager.setAdapter(adapter);
+        viewPager.setPagingEnabled(false);
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
         navView = findViewById(R.id.navigation);
         navView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
@@ -220,7 +228,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         name_of_category = findViewById(R.id.name_of_category);
         progressBar = findViewById(R.id.bar);
         bottom_constraint = findViewById(R.id.bottom_constraint);
-        frameLayout = findViewById(R.id.main_container);
+
         like = findViewById(R.id.like);
         dislike = findViewById(R.id.dislick);
         follow = findViewById(R.id.follow);
@@ -270,7 +278,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
 
                     @Override
                     public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                        if(charSequence.length()>=4){
+                        if (charSequence.length() >= 4) {
                             SearchFragment lastSMSFragment = (SearchFragment) getSupportFragmentManager().findFragmentByTag("searchFragment");
                             lastSMSFragment.getChoices(charSequence.toString());
                             lastSMSFragment.setVisible(View.VISIBLE);
@@ -325,6 +333,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                         break;
                 }
             }
+
             @Override
             public void onSlide(@NonNull View bottomSheet, float slideOffset) {
             }
@@ -401,7 +410,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                 );
                 layout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                 Log.d("sad", layout.getHeight() + "");
-                panel.setTopViewMarginBottom((int) (layout.getHeight() + px));
+                panel.setTopViewMarginBottom((int) (layout.getHeight() + px + panel.getTopViewMarginRight()));
             }
         });
         navView.setSelectedItemId(R.id.main);
@@ -465,7 +474,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             searcher.setVisibility(View.GONE);
             tol.getMenu().clear();
             search.setVisibility(View.VISIBLE);
-            if(searchView!=null) {
+            if (searchView != null) {
                 searchView.setText("");
             }
             searchView.setVisibility(View.GONE);
@@ -576,11 +585,11 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         if (mediaSource.getSize() != 1) {
             player.seekTo(mediaSource.getSize() - 1, C.TIME_UNSET);
         }
-        if(onPauseCalled){
-            onPauseCalled=false;
-            player.seekTo(windowIndex,position);
+        if (onPauseCalled) {
+            onPauseCalled = false;
+            player.seekTo(windowIndex, position);
             player.setPlayWhenReady(false);
-        }else{
+        } else {
             player.setPlayWhenReady(true);
         }
         ImageButton button = exoPlayerView.findViewById(R.id.fullscreen);
@@ -766,8 +775,8 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
 
         logedIn = pref.getBoolean("isLoged", false);
         Log.d("isLoged", pref.getString("session", null) + "");
-        if (player != null&!panel.isClosed()) {
-            Log.d("asdas",panel.isClosed()+"");
+        if (player != null & !panel.isClosed()) {
+            Log.d("asdas", panel.isClosed() + "");
             initPlayer();
         }
     }

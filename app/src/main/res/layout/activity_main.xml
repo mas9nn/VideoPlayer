@@ -85,12 +85,13 @@
 
     </androidx.appcompat.widget.Toolbar>
 
-    <FrameLayout
+    <com.example.videoplayer.ViewPager.CustomViewPager
         android:id="@+id/main_container"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@id/linear"
-        app:layout_constraintTop_toBottomOf="@id/toolbar" />
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
+        ></com.example.videoplayer.ViewPager.CustomViewPager>
 
     <FrameLayout
         android:id="@+id/searcher"
