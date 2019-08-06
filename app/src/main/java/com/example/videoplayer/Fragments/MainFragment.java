@@ -39,12 +39,14 @@ public class MainFragment extends Fragment implements ItemSelecListener, SwipeRe
     ItemSelecListener itemSelecListener;
     MainPageAdapter adapter;
     SwipeRefreshLayout mSwipeRefreshLayout;
+    int count = 0;
+
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         if (savedInstanceState != null) {
             //Restore the fragment's state here
-            Log.d("asdasd","assda");
+
         }
         super.onActivityCreated(savedInstanceState);
     }
@@ -55,7 +57,6 @@ public class MainFragment extends Fragment implements ItemSelecListener, SwipeRe
         itemSelecListener = this;
 
         recyclerView = v.findViewById(R.id.recycler);
-
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mSwipeRefreshLayout = v.findViewById(R.id.swipe_container);
         mSwipeRefreshLayout.setOnRefreshListener(this);
@@ -70,9 +71,11 @@ public class MainFragment extends Fragment implements ItemSelecListener, SwipeRe
             @Override
             public void run() {
 
-                if (mSwipeRefreshLayout != null) {
+                if (mSwipeRefreshLayout != null&count==0) {
                     mSwipeRefreshLayout.setRefreshing(true);
+                    count++;
                 }
+
                 // TODO Fetching data from server
                 try {
                     sendWorkPostRequest();
@@ -81,6 +84,11 @@ public class MainFragment extends Fragment implements ItemSelecListener, SwipeRe
                 }
             }
         });
+        Log.d("asdasd","save");
+        if (savedInstanceState != null) {
+            //Restore the fragment's state here
+
+        }
         return v;
     }
 
@@ -105,9 +113,21 @@ public class MainFragment extends Fragment implements ItemSelecListener, SwipeRe
 
     }
 
+    @Override
+    public void onResume() {
+        Log.d("asdasd","assda");
+        super.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        Log.d("asdasd","pau");
+        super.onPause();
+    }
+
     private void sendWorkPostRequest() throws JSONException {
-        Log.d("Response", "asd");
-        String requestUrl = "https://video.orzu.org/api/v1.0/?type=get_videos&limit=50";
+        String requestUrl = "https://video.orzu.org/api/v1.0/?type=get_videos&limit=5"+count;
+        Log.d("Response", requestUrl);
         StringRequest stringRequest = new StringRequest(Request.Method.POST, requestUrl, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -164,6 +184,7 @@ public class MainFragment extends Fragment implements ItemSelecListener, SwipeRe
     @Override
     public void onRefresh() {
         try {
+            count++;
             sendWorkPostRequest();
             adapter.notifyDataSetChanged();
         } catch (JSONException e) {

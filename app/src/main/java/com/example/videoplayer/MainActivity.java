@@ -112,6 +112,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.main:
+                    count_of_adapter = 1;
                     viewPager.setCurrentItem(0);
                     return true;
                 case R.id.chanels:
@@ -166,6 +167,8 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
     boolean disliked = false;
     Toolbar tol;
     FrameLayout searcher;
+
+    int count_of_adapter = 0;
 
     @Override
     public void onBackPressed() {

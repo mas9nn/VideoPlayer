@@ -3,6 +3,8 @@ package com.example.videoplayer.Models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.example.videoplayer.Adapters.MainPageAdapter;
+
 public class MainPageItems implements Parcelable {
     String preview_image, duration, name, channel_name, views, days;
     String url, id;
@@ -99,6 +101,18 @@ public class MainPageItems implements Parcelable {
     @Override
     public int describeContents() {
         return 0;
+    }
+
+    public boolean equals(Object ob){
+        if(this==ob)
+            return true;
+        if(!(ob instanceof MainPageItems))
+            return false;
+        //assume getter method in MyClass and this class has private variable myName, herName
+        return id.equals(((MainPageItems)ob).getId());
+    }
+    public int hashCode(){
+        return 0; //just for overriding purpose
     }
 
     @Override

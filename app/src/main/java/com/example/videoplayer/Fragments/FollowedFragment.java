@@ -82,6 +82,7 @@ public class FollowedFragment extends Fragment implements ItemSelecListener, Fol
     }
 
     public void getSubscribedChannels() {
+        list_logos.clear();
         String requestUrl = "https://video.orzu.org/api/v1.0/?type=get_subscriptions&channel=1";
         StringRequest stringRequest = new StringRequest(Request.Method.POST, requestUrl, new Response.Listener<String>() {
             @Override
@@ -125,6 +126,7 @@ public class FollowedFragment extends Fragment implements ItemSelecListener, Fol
     }
 
     private void getVideos(String id) {
+        items.clear();
         String requestUrl = "https://video.orzu.org/api/v1.0/?type=get_videos_by_channel&channel_id=" + id;
         StringRequest stringRequest = new StringRequest(Request.Method.POST, requestUrl, new Response.Listener<String>() {
             @Override

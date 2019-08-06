@@ -55,6 +55,7 @@ public class CategoryFragment extends Fragment implements ItemSelecListener {
     }
 
     public void getCategories() {
+        items.clear();
         String requestUrl = "https://video.orzu.org/api/v1.0/?type=get_settings";
         StringRequest stringRequest = new StringRequest(Request.Method.POST, requestUrl, new Response.Listener<String>() {
             @Override
