@@ -6,4 +6,5 @@
     <color name="colorNavIcon">#dae9f6</color>
     <color name="colorNavText">#01294b</color>
     <color name="gray">#e2e2e2</color>
+    <color name="gray_trans">#80e2e2e2</color>
 </resources>

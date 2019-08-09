@@ -3,8 +3,6 @@ package com.example.videoplayer.Models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.example.videoplayer.Adapters.MainPageAdapter;
-
 public class MainPageItems implements Parcelable {
     String preview_image, duration, name, channel_name, views, days;
     String url, id;
@@ -104,7 +102,6 @@ public class MainPageItems implements Parcelable {
     }
 
     public boolean equals(Object ob){
-        views = ((MainPageItems)ob).getViews();
         if(this==ob)
             return true;
         if(!(ob instanceof MainPageItems))

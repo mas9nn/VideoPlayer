@@ -158,7 +158,7 @@ public class MainFragment extends Fragment implements ItemSelecListener, SwipeRe
                             pageItems.setUrl(object.getString("video_location"));
                             pageItems.setId(object.getString("video_id"));
                             if (!items.contains(pageItems)) {
-                                items.add(pageItems);
+                                items.add(0,pageItems);
                             }
                             adapter.notifyDataSetChanged();
                             mSwipeRefreshLayout.setRefreshing(false);

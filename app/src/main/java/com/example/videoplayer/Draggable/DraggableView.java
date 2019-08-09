@@ -277,7 +277,7 @@ public class DraggableView extends RelativeLayout {
      * @return true if the view is minimized.
      */
     public boolean isMinimized() {
-        return isDragViewAtBottom() && isDragViewAtRight();
+        return isDragViewAtBottom() && isDragViewAtRight()&&!isClosed();
     }
 
     /**

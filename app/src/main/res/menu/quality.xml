@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/q1"
+        android:title="add"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/q2"
+        android:title="later"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/q3"
+        android:title="report"
+        app:showAsAction="always" /><item
+        android:id="@+id/q4"
+        android:title="report"
+        app:showAsAction="always" /><item
+        android:id="@+id/q5"
+        android:title="report"
+        app:showAsAction="always" /><item
+        android:id="@+id/q6"
+        android:title="report"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/q7"
+        android:title="report"
+        app:showAsAction="always" />
+</menu>

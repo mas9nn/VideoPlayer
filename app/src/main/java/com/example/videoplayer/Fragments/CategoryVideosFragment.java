@@ -19,12 +19,12 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.example.videoplayer.Adapters.ListViewAdapter;
 import com.example.videoplayer.Adapters.PanelAdapter;
 import com.example.videoplayer.Interfaces.ItemSelecListener;
 import com.example.videoplayer.MainActivity;
 import com.example.videoplayer.Models.MainPageItems;
 import com.example.videoplayer.R;
+import com.facebook.shimmer.ShimmerFrameLayout;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -42,6 +42,7 @@ public class CategoryVideosFragment extends Fragment implements ItemSelecListene
     ItemSelecListener itemSelecListenerl;
     List<MainPageItems> items = new ArrayList<>();
     PanelAdapter adapter;
+    ShimmerFrameLayout shimmer;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -50,6 +51,9 @@ public class CategoryVideosFragment extends Fragment implements ItemSelecListene
         recyclerView = v.findViewById(R.id.videos_in_search);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         itemSelecListenerl = this;
+        shimmer = v.findViewById(R.id.shimmer_category);
+        shimmer.startShimmer();
+        shimmer.setVisibility(View.VISIBLE);
         getVideos( ((MainActivity)getActivity()).getId());
         return v;
     }
@@ -87,6 +91,7 @@ public class CategoryVideosFragment extends Fragment implements ItemSelecListene
                         }
 
                     }
+                    shimmer.setVisibility(View.GONE);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

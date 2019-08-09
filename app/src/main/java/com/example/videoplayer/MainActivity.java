@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
@@ -18,6 +19,8 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.videoplayer.Adapters.PanelAdapter;
 import com.example.videoplayer.Adapters.ViewPagerAdapter;
+import com.example.videoplayer.DoubleClick.DoubleClick;
+import com.example.videoplayer.DoubleClick.DoubleClickListener;
 import com.example.videoplayer.Draggable.DraggableListener;
 import com.example.videoplayer.Draggable.DraggableView;
 import com.example.videoplayer.Fragments.CategoryFragment;
@@ -29,6 +32,7 @@ import com.example.videoplayer.Fragments.SearchFragment;
 import com.example.videoplayer.Interfaces.ItemSelecListener;
 import com.example.videoplayer.Models.MainPageItems;
 
+import com.example.videoplayer.Player.PlayerView;
 import com.example.videoplayer.ViewPager.CustomViewPager;
 import com.facebook.shimmer.ShimmerFrameLayout;
 import com.google.android.exoplayer2.C;
@@ -49,7 +53,7 @@ import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.ui.DefaultTimeBar;
-import com.google.android.exoplayer2.ui.PlayerView;
+import com.google.android.exoplayer2.ui.PlayerControlView;
 import com.google.android.exoplayer2.ui.TimeBar;
 import com.google.android.exoplayer2.upstream.BandwidthMeter;
 import com.google.android.exoplayer2.upstream.DataSource;
@@ -63,6 +67,7 @@ import com.squareup.picasso.Picasso;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.FragmentManager;
@@ -71,6 +76,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Handler;
+import android.os.SystemClock;
 import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -84,6 +90,11 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
+import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -141,7 +152,8 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
     ImageButton like, dislike;
     ImageView hide, cancel;
     Button follow;
-    List<MainPageItems> items = new ArrayList<>();
+    List<String> quality = new ArrayList<>();
+    List<String> quality_has = new ArrayList<>();
     List<MainPageItems> suggestions = new ArrayList<>();
     SharedPreferences pref;
     BottomNavigationView navView;
@@ -157,7 +169,6 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
     MediaSource videoSource;
     MediaSource suggestion;
     ConstraintLayout bottom_constraint, hidable;
-    FrameLayout frameLayout;
     ConcatenatingMediaSource mediaSource = new ConcatenatingMediaSource();
     ImageView search, channel_logo, arrow;
     List<String> ids = new ArrayList<>();
@@ -173,25 +184,36 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
 
     int count_of_adapter = 0;
 
+    long DOUBLE_CLICK_INTERVAL = 400;  // Time to wait the second click.
+
+    final Handler mHandler = new Handler();
+
+    int clicks;
+    boolean busy = false;
+
     @Override
     public void onBackPressed() {
-        Log.d("asd", searcher.getVisibility() + " " + panel.isClosed());
+        Log.d("asd", searcher.getVisibility() + " " + panel.isClosedAtRight());
         int orientation = getResources().getConfiguration().orientation;
         if (panel.isMaximized()) {
+            Log.d("asd", "max");
             if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
                 setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
             } else {
                 panel.minimize();
             }
+            if (searcher.getVisibility() == View.VISIBLE) {
+                Log.d("asd", "mbin");
+                homePressed();
+            }
+        } else if (searcher.getVisibility() == View.VISIBLE) {
+            homePressed();
+            Log.d("asd", "min");
         } else if (panel.isMinimized()) {
             panel.closeToLeft();
-        } else if (panel.isClosed()) {
-            if(searcher.getVisibility() == View.VISIBLE) {
-                Log.d("asd", "back");
-                menu.performIdentifierAction(android.R.id.home, 0);
-            }
+
         } else {
-            // super.onBackPressed();
+            super.onBackPressed();
         }
     }
 
@@ -204,6 +226,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
     double topView;
     CustomViewPager viewPager;
     ShimmerFrameLayout shimmer;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -217,6 +240,15 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         adapter.addFragment(new LoginFragment(), "LoginFragment");
         viewPager.setAdapter(adapter);
         viewPager.setPagingEnabled(false);
+
+        quality.add("240p");
+        quality.add("360p");
+        quality.add("480p");
+        quality.add("720p");
+        quality.add("1080p");
+        quality.add("2048p");
+        quality.add("4096p");
+
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
         navView = findViewById(R.id.navigation);
         navView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
@@ -484,20 +516,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
     public boolean onOptionsItemSelected(MenuItem item) {
         // handle arrow click here
         if (item.getItemId() == android.R.id.home) {
-            title.setVisibility(View.GONE);
-            searcher.setVisibility(View.GONE);
-            tol.getMenu().clear();
-            search.setVisibility(View.VISIBLE);
-            if (searchView != null) {
-                searchView.setText("");
-            }
-            searchView.setVisibility(View.GONE);
-            cancel.setVisibility(View.GONE);
-            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-            getSupportActionBar().setDisplayShowHomeEnabled(false);
-            InputMethodManager imm = (InputMethodManager) getSystemService(
-                    Context.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
+            homePressed();
         }
         if (item.getItemId() == R.id.action_micro) {
             final Dialog dialog = new Dialog(this);
@@ -505,6 +524,23 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             dialog.show();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void homePressed() {
+        title.setVisibility(View.GONE);
+        searcher.setVisibility(View.GONE);
+        tol.getMenu().clear();
+        search.setVisibility(View.VISIBLE);
+        if (searchView != null) {
+            searchView.setText("");
+        }
+        searchView.setVisibility(View.GONE);
+        cancel.setVisibility(View.GONE);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        getSupportActionBar().setDisplayShowHomeEnabled(false);
+        InputMethodManager imm = (InputMethodManager) getSystemService(
+                Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
     }
 
     public void MaximizePanel(String url, List<MainPageItems> items, int position) throws JSONException {
@@ -711,7 +747,180 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                 }
             }
         });
+        ImageButton quality = exoPlayerView.findViewById(R.id.setting);
+        quality.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
 
+                //creating a popup menu
+                PopupMenu popup = new PopupMenu(MainActivity.this, quality);
+                popup.getMenu().clear();
+                //inflating menu from xml resource
+                for (int i = 0; i < quality_has.size(); i++) {
+                    popup.getMenu().add(1, i, i + 1, quality_has.get(i));
+                }
+                //adding click listener
+
+                //displaying the popup
+                popup.show();
+            }
+        });
+
+        ConstraintLayout vpered = findViewById(R.id.vperedd);
+        vpered.setVisibility(View.VISIBLE);
+        exoPlayerView.setControllerShowTimeoutMs(2000);
+//        vpered.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Log.d("asdasdd", "slova" + "");
+//
+//                if (SystemClock.elapsedRealtime() - last_click[0] < 300) {
+//                    clicks++;
+//                    vpered.setVisibility(View.VISIBLE);
+//                    Log.d("asdasdd", SystemClock.elapsedRealtime() - last_click[0] + "");
+//                } else {
+//                    clicks = 0;
+//                    vpered.setVisibility(View.INVISIBLE);
+//                    Log.d("asdasd", SystemClock.elapsedRealtime() - last_click[0] + "");
+//                }
+//                last_click[0] = SystemClock.elapsedRealtime();
+//                if (clicks >= 1) {
+//                    player.seekTo(player.getCurrentPosition() + 5000);
+//                    exoPlayerView.hideController();
+//                } else {
+//                    if (exoPlayerView.isControllerVisible()) {
+//                        Handler handler = new Handler();
+//                        handler.postDelayed(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                exoPlayerView.hideController();
+//                            }
+//                        }, 300);
+//                    }else{
+//                        Handler handler = new Handler();
+//                        handler.postDelayed(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                exoPlayerView.showController();
+//                            }
+//                        }, 300);
+//                    }
+//                }
+//            }
+//        });
+        final long[] last_click = {0};
+        exoPlayerView.setControllerVisibilityListener(new PlayerControlView.VisibilityListener() {
+            @Override
+            public void onVisibilityChange(int visibility) {
+
+            }
+        });
+        TextView back = findViewById(R.id.back);
+        TextView back_txt = findViewById(R.id.back_txt);
+        TextView forward = findViewById(R.id.forward);
+        TextView forward_txt = findViewById(R.id.frw_text);
+
+        Handler handler = new Handler();
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+
+                Log.d("clicks", clicks + " " + (SystemClock.elapsedRealtime() - last_click[0]));
+                if (clicks == 1) {
+                    if(exoPlayerView.isControllerVisible()) {
+                        exoPlayerView.hideController();
+                    }else{
+                        exoPlayerView.showController();
+                    }
+                    clicks = 0;
+                } else {
+                    clicks = 0;
+                    back.setVisibility(View.GONE);
+                    back_txt.setVisibility(View.GONE);
+                    forward.setVisibility(View.GONE);
+                    forward_txt.setVisibility(View.GONE);
+                }
+            }
+        };
+        clicks = 0;
+        exoPlayerView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                    if (motionEvent.getX() > exoPlayerView.getWidth() / 2) {
+                        clicks++;
+                        if (clicks == 1) {
+                            last_click[0] = SystemClock.elapsedRealtime();
+                        }
+
+                        if (clicks >= 2 & SystemClock.elapsedRealtime() - last_click[0] < 500) {
+                            Log.d("asdasdd", SystemClock.elapsedRealtime() - last_click[0] + "");
+                            last_click[0] = SystemClock.elapsedRealtime();
+                        }
+
+                        if (clicks >= 2) {
+                            forward.setText(((clicks-1)*5)+"");
+                            forward.setVisibility(View.VISIBLE);
+                            forward_txt.setVisibility(View.VISIBLE);
+                            exoPlayerView.hideController();
+
+                            player.seekTo(player.getCurrentPosition() + 5000);
+                        }
+                        handler.removeCallbacks(runnable);
+                        handler.postDelayed(runnable,500);
+                    } else {
+                        clicks++;
+
+                        if (clicks == 1) {
+                            last_click[0] = SystemClock.elapsedRealtime();
+                        }
+
+                        if (clicks >= 2 & SystemClock.elapsedRealtime() - last_click[0] < 500) {
+                            Log.d("asdasdd", SystemClock.elapsedRealtime() - last_click[0] + "");
+                            last_click[0] = SystemClock.elapsedRealtime();
+                        }
+
+                        if (clicks >= 2) {
+                            exoPlayerView.hideController();
+                            back.setText(((clicks-1)*5)+"");
+                            back.setVisibility(View.VISIBLE);
+                            back_txt.setVisibility(View.VISIBLE);
+                            player.seekTo(player.getCurrentPosition() - 5000);
+                        }
+                        handler.removeCallbacks(runnable);
+                        handler.postDelayed(runnable,500);
+                    }
+                }
+                return false;
+            }
+        });
+//        ConstraintLayout nazad = findViewById(R.id.nazadd);
+//        nazad.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//
+//                if (SystemClock.elapsedRealtime() - last_click[0] < 300) {
+//                    clicks++;
+//                    Log.d("asdasdd", SystemClock.elapsedRealtime() - last_click[0] + "");
+//                } else {
+//                    clicks = 0;
+//                    Log.d("asdasd", SystemClock.elapsedRealtime() - last_click[0] + "");
+//                }
+//                last_click[0] = SystemClock.elapsedRealtime();
+//                if (clicks >= 1) {
+//                    if (player.getCurrentPosition() > 5000) {
+//                        player.seekTo(player.getCurrentPosition() - 5000);
+//                    }
+//                } else {
+//                    if (exoPlayerView.isControllerVisible()) {
+//
+//                        exoPlayerView.hideController();
+//                    }else{
+//                        exoPlayerView.showController();
+//                    }
+//                }
+//            }
+//        });
 
         name_of_video = exoPlayerView.findViewById(R.id.video_name);
 
@@ -829,6 +1038,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
     }
 
     private void requstByVideo(String id) throws JSONException {
+
         String requestUrl = "https://video.orzu.org/api/v1.0/?type=get_video_details&video_id=" + id;
         Log.d("ids", id);
         StringRequest stringRequest = new StringRequest(Request.Method.POST, requestUrl, new Response.Listener<String>() {
@@ -866,6 +1076,14 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                         follow.setText("подписаться");
                         followed = false;
                     }
+                    quality_has.clear();
+                    quality_has.add("Авто");
+                    for (int i = 0; i < quality.size(); i++) {
+                        if (data.getString(quality.get(i)).equals("1")) {
+                            quality_has.add(quality.get(i));
+                        }
+                    }
+                    initQuality();
                     progressBar.setVisibility(View.GONE);
                     bottom_constraint.setVisibility(View.VISIBLE);
                     shimmer.setVisibility(View.GONE);
@@ -926,6 +1144,10 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         };
 //make the request to your server as indicated in your request url
         Volley.newRequestQueue(MainActivity.this).add(stringRequest);
+    }
+
+    private void initQuality() {
+
     }
 
 
@@ -1015,7 +1237,6 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
 
     @Override
     public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
-        Log.d("trackchange", ids.size() + "asd");
 
     }
 
