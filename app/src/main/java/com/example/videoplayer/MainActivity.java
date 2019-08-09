@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.graphics.Color;
 import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
@@ -19,8 +18,6 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.videoplayer.Adapters.PanelAdapter;
 import com.example.videoplayer.Adapters.ViewPagerAdapter;
-import com.example.videoplayer.DoubleClick.DoubleClick;
-import com.example.videoplayer.DoubleClick.DoubleClickListener;
 import com.example.videoplayer.Draggable.DraggableListener;
 import com.example.videoplayer.Draggable.DraggableView;
 import com.example.videoplayer.Fragments.CategoryFragment;
@@ -90,11 +87,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
-import android.view.animation.AccelerateInterpolator;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.Animation;
-import android.view.animation.AnimationSet;
-import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -181,15 +173,8 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
     boolean disliked = false;
     Toolbar tol;
     FrameLayout searcher;
-
     int count_of_adapter = 0;
-
-    long DOUBLE_CLICK_INTERVAL = 400;  // Time to wait the second click.
-
-    final Handler mHandler = new Handler();
-
     int clicks;
-    boolean busy = false;
 
     @Override
     public void onBackPressed() {
@@ -216,7 +201,6 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             super.onBackPressed();
         }
     }
-
 
     ProgressBar progressBar;
     LinearLayout layoutBottomSheet;
@@ -514,7 +498,6 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // handle arrow click here
         if (item.getItemId() == android.R.id.home) {
             homePressed();
         }
@@ -593,7 +576,6 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // getMenuInflater().inflate(R.menu.search_menu,menu);
         this.menu = menu;
         return true;
     }
@@ -608,8 +590,6 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
     }
 
     private void initPlayer() {
-//        player.stop(true);
-
         BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
         TrackSelection.Factory videoTrackSelectionFactory =
                 new AdaptiveTrackSelection.Factory(bandwidthMeter);
@@ -751,17 +731,11 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         quality.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                //creating a popup menu
                 PopupMenu popup = new PopupMenu(MainActivity.this, quality);
                 popup.getMenu().clear();
-                //inflating menu from xml resource
                 for (int i = 0; i < quality_has.size(); i++) {
                     popup.getMenu().add(1, i, i + 1, quality_has.get(i));
                 }
-                //adding click listener
-
-                //displaying the popup
                 popup.show();
             }
         });
@@ -769,45 +743,6 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         ConstraintLayout vpered = findViewById(R.id.vperedd);
         vpered.setVisibility(View.VISIBLE);
         exoPlayerView.setControllerShowTimeoutMs(2000);
-//        vpered.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Log.d("asdasdd", "slova" + "");
-//
-//                if (SystemClock.elapsedRealtime() - last_click[0] < 300) {
-//                    clicks++;
-//                    vpered.setVisibility(View.VISIBLE);
-//                    Log.d("asdasdd", SystemClock.elapsedRealtime() - last_click[0] + "");
-//                } else {
-//                    clicks = 0;
-//                    vpered.setVisibility(View.INVISIBLE);
-//                    Log.d("asdasd", SystemClock.elapsedRealtime() - last_click[0] + "");
-//                }
-//                last_click[0] = SystemClock.elapsedRealtime();
-//                if (clicks >= 1) {
-//                    player.seekTo(player.getCurrentPosition() + 5000);
-//                    exoPlayerView.hideController();
-//                } else {
-//                    if (exoPlayerView.isControllerVisible()) {
-//                        Handler handler = new Handler();
-//                        handler.postDelayed(new Runnable() {
-//                            @Override
-//                            public void run() {
-//                                exoPlayerView.hideController();
-//                            }
-//                        }, 300);
-//                    }else{
-//                        Handler handler = new Handler();
-//                        handler.postDelayed(new Runnable() {
-//                            @Override
-//                            public void run() {
-//                                exoPlayerView.showController();
-//                            }
-//                        }, 300);
-//                    }
-//                }
-//            }
-//        });
         final long[] last_click = {0};
         exoPlayerView.setControllerVisibilityListener(new PlayerControlView.VisibilityListener() {
             @Override
@@ -894,34 +829,6 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                 return false;
             }
         });
-//        ConstraintLayout nazad = findViewById(R.id.nazadd);
-//        nazad.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//
-//                if (SystemClock.elapsedRealtime() - last_click[0] < 300) {
-//                    clicks++;
-//                    Log.d("asdasdd", SystemClock.elapsedRealtime() - last_click[0] + "");
-//                } else {
-//                    clicks = 0;
-//                    Log.d("asdasd", SystemClock.elapsedRealtime() - last_click[0] + "");
-//                }
-//                last_click[0] = SystemClock.elapsedRealtime();
-//                if (clicks >= 1) {
-//                    if (player.getCurrentPosition() > 5000) {
-//                        player.seekTo(player.getCurrentPosition() - 5000);
-//                    }
-//                } else {
-//                    if (exoPlayerView.isControllerVisible()) {
-//
-//                        exoPlayerView.hideController();
-//                    }else{
-//                        exoPlayerView.showController();
-//                    }
-//                }
-//            }
-//        });
-
         name_of_video = exoPlayerView.findViewById(R.id.video_name);
 
         channel_names = exoPlayerView.findViewById(R.id.channel_names);
@@ -968,7 +875,6 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             Display display = getWindowManager().getDefaultDisplay();
             Point size = new Point();
             display.getSize(size);
-            int height = size.y;
             int width = size.x;
             double topView = width * 0.55;
             params.height = (int) topView;
@@ -1138,11 +1044,9 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                         postMap.put("user_id", pref.getString("userId", null));
                     }
                 }
-                //..... Add as many key value pairs in the map as necessary for your request
                 return postMap;
             }
         };
-//make the request to your server as indicated in your request url
         Volley.newRequestQueue(MainActivity.this).add(stringRequest);
     }
 
@@ -1156,12 +1060,12 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         StringRequest stringRequest = new StringRequest(Request.Method.POST, requestUrl, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                Log.e("Respose", "" + response); //the response contains the result from the server, a json string or any other object returned by your server
+                Log.e("Respose", "" + response);
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                error.printStackTrace(); //log the error resulting from the request for diagnosis/debugging
+                error.printStackTrace();
             }
         }) {
             @Override
@@ -1202,7 +1106,6 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                 return postMap;
             }
         };
-//make the request to your server as indicated in your request url
         Volley.newRequestQueue(MainActivity.this).add(stringRequest);
     }
 
