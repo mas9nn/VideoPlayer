@@ -56,6 +56,8 @@ public class SearchFragment extends Fragment implements ItemSelecListener {
         listView.setDivider(null);
         listView.setDividerHeight(0);
         itemSelecListenerl = this;
+        listViewAdapter = new ListViewAdapter(getContext(), choices);
+        listView.setAdapter(listViewAdapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -147,14 +149,12 @@ public class SearchFragment extends Fragment implements ItemSelecListener {
                             Log.d("Response", data.get(i) + "");
                             JSONObject object = data.getJSONObject(i);
                             choices.add(object.getString("title"));
-                            listViewAdapter = new ListViewAdapter(getContext(), choices);
-                            listView.setAdapter(listViewAdapter);
-
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
 
                     }
+                    listViewAdapter.notifyDataSetChanged();
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

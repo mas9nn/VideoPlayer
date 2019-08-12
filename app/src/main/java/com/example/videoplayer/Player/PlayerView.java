@@ -633,6 +633,8 @@ public class PlayerView extends FrameLayout implements AdsLoader.AdViewProvider 
         }
     }
 
+
+
     /**
      * Returns the playback controls timeout. The playback controls are automatically hidden after
      * this duration of time has elapsed without user input and with playback or buffering in

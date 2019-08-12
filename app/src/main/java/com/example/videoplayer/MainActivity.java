@@ -1,7 +1,9 @@
 package com.example.videoplayer;
 
 import android.app.Dialog;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
@@ -75,6 +77,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.provider.Settings;
+import android.speech.RecognizerIntent;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -98,6 +101,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -107,6 +111,7 @@ import java.util.ArrayList;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements View.OnTouchListener, ItemSelecListener, Player.EventListener {
@@ -142,7 +147,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
 
     RecyclerView recyclerInPanel;
     ImageButton like, dislike;
-    ImageView hide, cancel;
+    ImageView hide, cancel, voice;
     Button follow;
     List<String> quality = new ArrayList<>();
     List<String> quality_has = new ArrayList<>();
@@ -152,6 +157,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
     DefaultTrackSelector trackSelector;
     String waterUrl = "https://video.orzu.org/upload/videos/2019/06/1DZjZiEBOEfGfcAslyHh_25_38aa4abb775fd1e9d30afdbf21561613_video_240p_converted.mp4";
     String id = "";
+    String url_of_data = "";
     String id_of_category = "";
     String channel_id = "";
     PanelAdapter panelAdapter;
@@ -210,6 +216,23 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
     double topView;
     CustomViewPager viewPager;
     ShimmerFrameLayout shimmer;
+    private final int REQ_CODE = 100;
+    Uri data_uri;
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case REQ_CODE: {
+                if (resultCode == RESULT_OK && null != data) {
+                    ArrayList result = data
+                            .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                    searchView.setText(result.get(0).toString());
+                }
+                break;
+            }
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -266,6 +289,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         hidable = findViewById(R.id.hidable);
         title = findViewById(R.id.title_tol);
         cancel = findViewById(R.id.clear_btn);
+        voice = findViewById(R.id.voice);
         searchView = findViewById(R.id.searcher_edit_text);
         itemSelecListener = this;
 
@@ -283,6 +307,24 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             }
         });
 
+        voice.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                        RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
+                intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Говорите");
+                try {
+                    startActivityForResult(intent, REQ_CODE);
+                } catch (ActivityNotFoundException a) {
+                    Toast.makeText(getApplicationContext(),
+                            "Sorry your device not supported",
+                            Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
         tol.inflateMenu(R.menu.search_menu);
         setSupportActionBar(tol);
         search.setOnClickListener(new View.OnClickListener() {
@@ -292,6 +334,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                 search.setVisibility(View.GONE);
                 searchView.setVisibility(View.VISIBLE);
                 cancel.setVisibility(View.VISIBLE);
+                voice.setVisibility(View.VISIBLE);
                 getSupportActionBar().setDisplayHomeAsUpEnabled(true);
                 getSupportActionBar().setDisplayShowHomeEnabled(true);
                 tol.inflateMenu(R.menu.second_search);
@@ -415,6 +458,18 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             }
         });
 
+        ImageButton share = findViewById(R.id.share);
+        share.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+                sharingIntent.setType("text/plain");
+                sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "https://video.orzu.org/watch/" + ids.get(player.getCurrentWindowIndex()));
+                sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, "https://video.orzu.org/watch/" + ids.get(player.getCurrentWindowIndex()));
+                startActivity(Intent.createChooser(sharingIntent, "share:"));
+            }
+        });
+
         final LinearLayout layout = findViewById(R.id.linear);
         panel = findViewById(R.id.draggable_view);
         Display display = getWindowManager().getDefaultDisplay();
@@ -477,7 +532,27 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             }
         });
 
+        Intent intent = getIntent();
+        data_uri = intent.getData();
+        Log.d("data", data_uri + "");
+        if (data_uri != null) {
+            String string = data_uri + "";
+            String[] parts = string.split("/");
+            Log.d("data", parts[parts.length - 1] + "");
 
+            hide.setImageResource(R.drawable.ic_keyboard_arrow_down_black_24dp);
+            hidable.setVisibility(View.GONE);
+            bottom_constraint.setVisibility(View.INVISIBLE);
+            shimmer.setVisibility(View.VISIBLE);
+            layoutBottomSheet.setVisibility(View.GONE);
+            panel.setVisibility(View.VISIBLE);
+            try {
+                requstByVideo(parts[parts.length - 1]);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+        }
     }
 
     public void openCategory(String id, String name) {
@@ -519,6 +594,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         }
         searchView.setVisibility(View.GONE);
         cancel.setVisibility(View.GONE);
+        voice.setVisibility(View.GONE);
         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         getSupportActionBar().setDisplayShowHomeEnabled(false);
         InputMethodManager imm = (InputMethodManager) getSystemService(
@@ -750,7 +826,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
 
             }
         });
-        TextView back = findViewById(R.id.back);
+        final TextView back = findViewById(R.id.back);
         TextView back_txt = findViewById(R.id.back_txt);
         TextView forward = findViewById(R.id.forward);
         TextView forward_txt = findViewById(R.id.frw_text);
@@ -762,9 +838,9 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
 
                 Log.d("clicks", clicks + " " + (SystemClock.elapsedRealtime() - last_click[0]));
                 if (clicks == 1) {
-                    if(exoPlayerView.isControllerVisible()) {
+                    if (exoPlayerView.isControllerVisible()) {
                         exoPlayerView.hideController();
-                    }else{
+                    } else {
                         exoPlayerView.showController();
                     }
                     clicks = 0;
@@ -777,54 +853,69 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                 }
             }
         };
+        final boolean[] frwd = {false};
+        final boolean[] bck = {false};
         clicks = 0;
         exoPlayerView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
-                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                    if (motionEvent.getX() > exoPlayerView.getWidth() / 2) {
-                        clicks++;
-                        if (clicks == 1) {
-                            last_click[0] = SystemClock.elapsedRealtime();
-                        }
+                switch (motionEvent.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        if (motionEvent.getX() > exoPlayerView.getWidth() / 2) {
+                            if(bck[0]){
+                                clicks = 0;
+                            }
+                            frwd[0] = true;
+                            bck[0] = false;
+                            back.setVisibility(View.GONE);
+                            back_txt.setVisibility(View.GONE);
+                            clicks++;
+                            if (clicks == 1) {
+                                last_click[0] = SystemClock.elapsedRealtime();
+                            }
+                            if (clicks >= 2 & SystemClock.elapsedRealtime() - last_click[0] < 500) {
+                                Log.d("asdasdd", SystemClock.elapsedRealtime() - last_click[0] + "");
+                                last_click[0] = SystemClock.elapsedRealtime();
+                            }
+                            if (clicks >= 2) {
+                                forward.setText(((clicks - 1) * 5) + "");
+                                forward.setVisibility(View.VISIBLE);
+                                forward_txt.setVisibility(View.VISIBLE);
+                                exoPlayerView.hideController();
 
-                        if (clicks >= 2 & SystemClock.elapsedRealtime() - last_click[0] < 500) {
-                            Log.d("asdasdd", SystemClock.elapsedRealtime() - last_click[0] + "");
-                            last_click[0] = SystemClock.elapsedRealtime();
-                        }
+                                player.seekTo(player.getCurrentPosition() + 5000);
+                            }
+                            handler.removeCallbacks(runnable);
+                            handler.postDelayed(runnable, 500);
+                        } else {
+                            if(frwd[0]){
+                                clicks = 0;
+                            }
+                            bck[0] = true;
+                            frwd[0] = false;
+                            forward.setVisibility(View.GONE);
+                            forward_txt.setVisibility(View.GONE);
+                            clicks++;
+                            if (clicks == 1) {
+                                last_click[0] = SystemClock.elapsedRealtime();
+                            }
 
-                        if (clicks >= 2) {
-                            forward.setText(((clicks-1)*5)+"");
-                            forward.setVisibility(View.VISIBLE);
-                            forward_txt.setVisibility(View.VISIBLE);
-                            exoPlayerView.hideController();
+                            if (clicks >= 2 & SystemClock.elapsedRealtime() - last_click[0] < 500) {
+                                Log.d("asdasdd", SystemClock.elapsedRealtime() - last_click[0] + "");
+                                last_click[0] = SystemClock.elapsedRealtime();
+                            }
 
-                            player.seekTo(player.getCurrentPosition() + 5000);
+                            if (clicks >= 2) {
+                                exoPlayerView.hideController();
+                                back.setText(((clicks - 1) * 5) + "");
+                                back.setVisibility(View.VISIBLE);
+                                back_txt.setVisibility(View.VISIBLE);
+                                player.seekTo(player.getCurrentPosition() - 5000);
+                            }
+                            handler.removeCallbacks(runnable);
+                            handler.postDelayed(runnable, 500);
                         }
-                        handler.removeCallbacks(runnable);
-                        handler.postDelayed(runnable,500);
-                    } else {
-                        clicks++;
-
-                        if (clicks == 1) {
-                            last_click[0] = SystemClock.elapsedRealtime();
-                        }
-
-                        if (clicks >= 2 & SystemClock.elapsedRealtime() - last_click[0] < 500) {
-                            Log.d("asdasdd", SystemClock.elapsedRealtime() - last_click[0] + "");
-                            last_click[0] = SystemClock.elapsedRealtime();
-                        }
-
-                        if (clicks >= 2) {
-                            exoPlayerView.hideController();
-                            back.setText(((clicks-1)*5)+"");
-                            back.setVisibility(View.VISIBLE);
-                            back_txt.setVisibility(View.VISIBLE);
-                            player.seekTo(player.getCurrentPosition() - 5000);
-                        }
-                        handler.removeCallbacks(runnable);
-                        handler.postDelayed(runnable,500);
-                    }
+                        return true;
                 }
                 return false;
             }
@@ -966,6 +1057,8 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                     date.setText(data.getString("time_alpha"));
                     name_of_video_bottom.setText(data.getString("title"));
                     name_of_category.setText(data.getString("category_name"));
+                    url_of_data = data.getString("video_location");
+
                     if (data.getString("is_liked").equals("1")) {
                         like.setImageResource(R.drawable.ic_favorite_blue);
                     } else
@@ -1021,7 +1114,20 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                         }
                     }
                     if (suggestions.size() != 0) {
+
                         addSuggestion(suggestions.get(0).getUrl());
+                    }
+                    if (data_uri != null) {
+                        waterUrl = url_of_data;
+                        Log.d("positions", lastPosition + " " + position + " " + player);
+                        if (lastPosition != position) {
+                            releasePlayer();
+                            initPlayer();
+                            panel.maximize();
+                        } else {
+                            panel.maximize();
+                        }
+                        lastPosition = position;
                     }
                     //       addSuggestion(suggestions.get(0).getUrl());
                 } catch (JSONException e) {
