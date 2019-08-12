@@ -42,6 +42,10 @@ public class ListViewAdapter extends BaseAdapter {
         return position;
     }
 
+    public void clearItems() {
+        mData.clear();
+    }
+
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View v = LayoutInflater.from(context).inflate(R.layout.list_view_items, parent, false);

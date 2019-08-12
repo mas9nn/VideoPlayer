@@ -1,7 +1,6 @@
 package com.example.videoplayer.Adapters;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,40 +17,41 @@ import java.util.List;
 
 public class FollowedAdapter extends RecyclerView.Adapter<FollowedAdapter.ViewHolder> {
 
-    List<FollowedItems> list;
-    Context context;
+    private List<FollowedItems> logos;
+    private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
 
-    public FollowedAdapter(List<FollowedItems> list, Context context) {
-        this.list = list;
-        this.context = context;
+    // data is passed into the constructor
+    public FollowedAdapter(Context context, List<FollowedItems> logos) {
+        this.mInflater = LayoutInflater.from(context);
+        this.logos = logos;
     }
 
-
-    @NonNull
+    // inflates the row layout from xml when needed
     @Override
-    public FollowedAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.logo_items,parent,false);
+    @NonNull
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = mInflater.inflate(R.layout.logo_items, parent, false);
         return new ViewHolder(view);
     }
 
+    // binds the data to the view and textview in each row
     @Override
-    public void onBindViewHolder(@NonNull FollowedAdapter.ViewHolder holder, int position) {
-        Picasso.get().load(list.get(position).getLogo()).into(holder.logo);
-        Log.d("prikol",list.get(position).getLogo());
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        Picasso.get().load(logos.get(position).getLogo()).into(holder.logo);
     }
 
+    // total number of rows
     @Override
     public int getItemCount() {
-        return list.size();
+        return logos.size();
     }
 
-
+    // stores and recycles views as they are scrolled off screen
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-
         ImageView logo;
 
-        public ViewHolder(@NonNull View itemView) {
+        ViewHolder(View itemView) {
             super(itemView);
             logo = itemView.findViewById(R.id.logo);
             itemView.setOnClickListener(this);
@@ -62,6 +62,13 @@ public class FollowedAdapter extends RecyclerView.Adapter<FollowedAdapter.ViewHo
             if (mClickListener != null) mClickListener.onItemClick(view, getAdapterPosition());
         }
     }
+
+    // convenience method for getting data at click position
+    public FollowedItems getItem(int id) {
+        return logos.get(id);
+    }
+
+    // allows clicks events to be caught
     public void setClickListener(ItemClickListener itemClickListener) {
         this.mClickListener = itemClickListener;
     }

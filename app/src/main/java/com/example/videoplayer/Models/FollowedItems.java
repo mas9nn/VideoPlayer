@@ -1,11 +1,12 @@
 package com.example.videoplayer.Models;
 
 public class FollowedItems {
-    String logo,id;
+    String logo,id,title;
 
-    public FollowedItems(String logo, String id) {
+    public FollowedItems(String logo, String id,String title) {
         this.logo = logo;
         this.id = id;
+        this.title = title;
     }
 
     public String getLogo() {
@@ -22,5 +23,13 @@ public class FollowedItems {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 }

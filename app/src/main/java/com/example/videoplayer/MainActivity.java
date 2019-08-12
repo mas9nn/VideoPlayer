@@ -20,10 +20,12 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.videoplayer.Adapters.PanelAdapter;
 import com.example.videoplayer.Adapters.ViewPagerAdapter;
+import com.example.videoplayer.Common.Common;
 import com.example.videoplayer.Draggable.DraggableListener;
 import com.example.videoplayer.Draggable.DraggableView;
 import com.example.videoplayer.Fragments.CategoryFragment;
 import com.example.videoplayer.Fragments.CategoryVideosFragment;
+import com.example.videoplayer.Fragments.ChannelFragment;
 import com.example.videoplayer.Fragments.FollowedFragment;
 import com.example.videoplayer.Fragments.LoginFragment;
 import com.example.videoplayer.Fragments.MainFragment;
@@ -69,6 +71,7 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -159,6 +162,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
     String id = "";
     String url_of_data = "";
     String id_of_category = "";
+    String id_of_channel = "";
     String channel_id = "";
     PanelAdapter panelAdapter;
     private static final String APP_NAME = MainActivity.class.getSimpleName();
@@ -330,7 +334,8 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                fragmentManager.beginTransaction().replace(R.id.searcher, new SearchFragment(), "searchFragment").commit();
+                fragmentManager.beginTransaction().replace(R.id.searcher, new SearchFragment(), "categoryVideos").commit();
+                title.setVisibility(View.GONE);
                 search.setVisibility(View.GONE);
                 searchView.setVisibility(View.VISIBLE);
                 cancel.setVisibility(View.VISIBLE);
@@ -347,7 +352,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                     @Override
                     public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                         if (charSequence.length() >= 4) {
-                            SearchFragment lastSMSFragment = (SearchFragment) getSupportFragmentManager().findFragmentByTag("searchFragment");
+                            SearchFragment lastSMSFragment = (SearchFragment) getSupportFragmentManager().findFragmentByTag("categoryVideos");
                             lastSMSFragment.getChoices(charSequence.toString());
                             lastSMSFragment.setVisible(View.VISIBLE);
                         }
@@ -362,7 +367,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                     @Override
                     public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
                         if (i == EditorInfo.IME_ACTION_DONE) {
-                            SearchFragment lastSMSFragment = (SearchFragment) getSupportFragmentManager().findFragmentByTag("searchFragment");
+                            SearchFragment lastSMSFragment = (SearchFragment) getSupportFragmentManager().findFragmentByTag("categoryVideos");
                             lastSMSFragment.getVideos(textView.getText().toString());
                             lastSMSFragment.setVisible(View.GONE);
                             return true;
@@ -555,11 +560,22 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         }
     }
 
+
+    public void openChannel(String channel_name,String id_channel){
+        Common.channelId = id_channel;
+        fragmentManager.beginTransaction().replace(R.id.searcher, new ChannelFragment(), "categoryVideos").commit();
+        searcher.setVisibility(View.VISIBLE);
+        tol.getMenu().clear();
+        title.setVisibility(View.VISIBLE);
+        title.setText(channel_name);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+    }
+
     public void openCategory(String id, String name) {
         id_of_category = id;
         fragmentManager.beginTransaction().replace(R.id.searcher, new CategoryVideosFragment(), "categoryVideos").commit();
         searcher.setVisibility(View.VISIBLE);
-        search.setVisibility(View.GONE);
         tol.getMenu().clear();
         title.setVisibility(View.VISIBLE);
         title.setText(name);
@@ -586,6 +602,8 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
 
     private void homePressed() {
         title.setVisibility(View.GONE);
+        Fragment fragment = fragmentManager.findFragmentByTag("categoryVideos");
+        fragmentManager.beginTransaction().remove(fragment).commitAllowingStateLoss();
         searcher.setVisibility(View.GONE);
         tol.getMenu().clear();
         search.setVisibility(View.VISIBLE);

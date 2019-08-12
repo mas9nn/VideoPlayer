@@ -56,8 +56,7 @@ public class SearchFragment extends Fragment implements ItemSelecListener {
         listView.setDivider(null);
         listView.setDividerHeight(0);
         itemSelecListenerl = this;
-        listViewAdapter = new ListViewAdapter(getContext(), choices);
-        listView.setAdapter(listViewAdapter);
+
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -71,7 +70,6 @@ public class SearchFragment extends Fragment implements ItemSelecListener {
 
     public void getVideos(String query) {
         items.clear();
-
         String requestUrl = "https://video.orzu.org/api/v1.0/?type=search_videos&keyword=" + query;
         StringRequest stringRequest = new StringRequest(Request.Method.POST, requestUrl, new Response.Listener<String>() {
             @Override
@@ -133,7 +131,8 @@ public class SearchFragment extends Fragment implements ItemSelecListener {
         listView.setVisibility(visibility);
     }
     public void getChoices(String query) {
-        choices.clear();
+
+//        listViewAdapter.clearItems();
         if (listViewAdapter!=null){
             listViewAdapter.notifyDataSetChanged();
         }
@@ -144,17 +143,18 @@ public class SearchFragment extends Fragment implements ItemSelecListener {
                 try {
                     JSONObject j = new JSONObject(response);
                     JSONArray data = j.getJSONArray("data");
+                    Log.d("Response", data.length() + "");
+                    choices.clear();
                     for (int i = 0; i < data.length(); i++) {
                         try {
-                            Log.d("Response", data.get(i) + "");
                             JSONObject object = data.getJSONObject(i);
                             choices.add(object.getString("title"));
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-
                     }
-                    listViewAdapter.notifyDataSetChanged();
+                    listViewAdapter = new ListViewAdapter(getContext(), choices);
+                    listView.setAdapter(listViewAdapter);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

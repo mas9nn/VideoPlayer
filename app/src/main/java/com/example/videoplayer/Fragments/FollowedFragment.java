@@ -59,7 +59,8 @@ public class FollowedFragment extends Fragment implements ItemSelecListener, Fol
         logos.setLayoutManager(layoutManager);
         videos.setLayoutManager(new LinearLayoutManager(getContext()));
         getSubscribedChannels();
-        logo_adapter = new FollowedAdapter(list_logos, getContext());
+        logo_adapter = new FollowedAdapter( getContext(),list_logos);
+
         logos.setAdapter(logo_adapter);
         logo_adapter.setClickListener(this);
         return v;
@@ -94,12 +95,20 @@ public class FollowedFragment extends Fragment implements ItemSelecListener, Fol
                         JSONObject channels = data.getJSONObject(i);
                         String id = channels.getString("id");
                         String logo = channels.getString("avatar");
+                        String title = channels.getString("first_name");
                         Log.d("prikol", id + " " + logo);
-                        list_logos.add(new FollowedItems(logo, id));
-                        logo_adapter = new FollowedAdapter(list_logos, getContext());
-                        logos.setAdapter(logo_adapter);
+                        list_logos.add(new FollowedItems(logo, id,title));
                         getVideos(id);
                     }
+                    logo_adapter = new FollowedAdapter(getContext(),list_logos);
+                    logos.setAdapter(logo_adapter);
+                    logo_adapter.setClickListener(new FollowedAdapter.ItemClickListener() {
+                        @Override
+                        public void onItemClick(View view, int position) {
+                            ((MainActivity) getActivity()).changePostion();
+                            ((MainActivity) getActivity()).openChannel(list_logos.get(position).getTitle(),list_logos.get(position).getId());
+                        }
+                    });
                     Log.d("dataFollowed", data + "");
                 } catch (JSONException e) {
                     e.printStackTrace();
