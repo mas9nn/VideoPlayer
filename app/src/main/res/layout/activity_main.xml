@@ -232,6 +232,7 @@
                         android:id="@+id/dislick"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:tint="?attr/tintColor"
                         android:layout_marginLeft="10dp"
                         android:layout_marginTop="15dp"
                         android:background="@android:color/transparent"
@@ -256,6 +257,7 @@
                         android:layout_height="wrap_content"
                         android:background="@android:color/transparent"
                         android:src="@drawable/ic_share_black_24dp"
+                        android:tint="?attr/tintColor"
                         draggable_view:layout_constraintBottom_toBottomOf="@id/like"
                         draggable_view:layout_constraintRight_toRightOf="parent"
                         draggable_view:layout_constraintTop_toTopOf="@id/like" />
@@ -266,6 +268,7 @@
                         android:layout_marginRight="20dp"
                         android:background="@android:color/transparent"
                         android:src="@drawable/ic_add_black_24dp"
+                        android:tint="?attr/tintColor"
                         draggable_view:layout_constraintBottom_toBottomOf="@id/like"
                         draggable_view:layout_constraintRight_toLeftOf="@id/share"
                         draggable_view:layout_constraintTop_toTopOf="@id/like" />

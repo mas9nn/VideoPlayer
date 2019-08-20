@@ -72,6 +72,7 @@ import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
+import com.google.android.exoplayer2.video.VideoListener;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.squareup.picasso.Picasso;
 
@@ -107,6 +108,7 @@ import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -170,7 +172,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
     private boolean onPauseCalled = false;
     int windowIndex, position;
     int lastPosition = -213;
-    boolean logedIn;
+    boolean logedIn, notHim,autoplay;
     boolean liked = false;
     boolean followed = false;
     Toolbar tol;
@@ -194,6 +196,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
     List<String> choises = new ArrayList<>();
     SharedPreferences.Editor editor;
     MeowBottomNavigation meowBottomNavigation;
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -208,6 +211,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             }
         }
     }
+
     @Override
     public void onBackPressed() {
         Log.d("asd", searcher.getVisibility() + " " + panel.isClosedAtRight());
@@ -233,6 +237,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             super.onBackPressed();
         }
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -305,7 +310,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         quality.add("4096p");
 
         receiver = new NetworkChangeReceiver();
-        registerReceiver(receiver,new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+        registerReceiver(receiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
         viewPager.setOffscreenPageLimit(0);
         //  AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
@@ -342,7 +347,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         voice = findViewById(R.id.voice);
         searchView = findViewById(R.id.searcher_edit_text);
         itemSelecListener = this;
-
+        aSwitch = findViewById(R.id.next_video);
         tol = findViewById(R.id.toolbar);
         hide.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -354,6 +359,18 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                 } else {
                     hide.setImageResource(R.drawable.ic_keyboard_arrow_down_black_24dp);
                     hidable.setVisibility(View.GONE);
+                }
+            }
+        });
+
+
+        aSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if(!b){
+                    autoplay = false;
+                }else{
+                    autoplay = true;
                 }
             }
         });
@@ -634,8 +651,10 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             shimmer.setVisibility(View.VISIBLE);
             layoutBottomSheet.setVisibility(View.GONE);
             panel.setVisibility(View.VISIBLE);
+            ids.add(parts[parts.length-1]);
             try {
                 requstByVideo(parts[parts.length - 1]);
+
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -779,9 +798,12 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         layoutBottomSheet.setVisibility(View.GONE);
         panel.setVisibility(View.VISIBLE);
         id = items.get(position).getId();
+        ids.add(id);
         Log.d("items", items.size() + " " + position);
-        requstByVideo(items.get(position).getId());
+       // requstByVideo(items.get(position).getId());
+        notHim = false;
         waterUrl = url;
+
         Log.d("positions", lastPosition + " " + position + " " + player);
         if (lastPosition != position) {
             releasePlayer();
@@ -858,7 +880,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
 
         mediaSource.addMediaSource(videoSource);
 
-        ids.add(id);
+
         player.addListener(this);
         player.prepare(mediaSource);
         if (mediaSource.getSize() != 1) {
@@ -910,7 +932,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             @Override
             public void onScrubStart(TimeBar timeBar, long position) {
                 Log.d("dddd", "OnStart");
-                // panel.disable(false);
+                panel.cancelHelper();
                 player.seekTo(position);
                 panel.setClickToMaximizeEnabled(false);
             }
@@ -918,8 +940,9 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             @Override
             public void onScrubMove(TimeBar timeBar, long position) {
                 player.seekTo(position);
+                panel.cancelHelper();
                 player.setPlayWhenReady(true);
-                //  panel.disable(false);
+                panel.disable(false);
                 panel.setClickToMaximizeEnabled(false);
                 Log.d("dddd", "onmove");
             }
@@ -942,15 +965,16 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             @Override
             public void onClick(View view) {
                 player.seekTo(player.getCurrentWindowIndex() + 1, C.POSITION_UNSET);
-                try {
-                    if (ids.size() != 1) {
-                        requstByVideo(ids.get(player.getCurrentWindowIndex()));
-                        player.setPlayWhenReady(true);
-                        Log.d("ids", ids.get(player.getCurrentWindowIndex()) + "");
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+//                try {
+//                    if (ids.size() != 1) {
+//                        requstByVideo(ids.get(player.getCurrentWindowIndex()));
+//                        notHim = false;
+//                        player.setPlayWhenReady(true);
+//                        Log.d("ids", ids.get(player.getCurrentWindowIndex()) + "");
+//                    }
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
             }
         });
         ImageButton previous = exoPlayerView.findViewById(R.id.exo_prev);
@@ -963,13 +987,14 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                         ids.remove(ids.size() - 1);
                         mediaSource.removeMediaSource(mediaSource.getSize() - 1);
                     }
-                    try {
-                        if (ids.size() != 1) {
-                            requstByVideo(ids.get(player.getCurrentWindowIndex()));
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
+//                    try {
+//                        if (ids.size() != 1) {
+//                            requstByVideo(ids.get(player.getCurrentWindowIndex()));
+//                            notHim = false;
+//                        }
+//                    } catch (JSONException e) {
+//                        e.printStackTrace();
+//                    }
                 }
             }
         });
@@ -1117,9 +1142,8 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
 
     }
 
-
     public void onConfigurationChanged(Configuration newConfig) {
-        Log.d("asd", "asd");
+
         super.onConfigurationChanged(newConfig);
 
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
@@ -1304,7 +1328,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                         }
                     }
                     if (suggestions.size() != 0) {
-
+                        Log.d("syges", suggestions.get(0).getUrl());
                         addSuggestion(suggestions.get(0).getUrl());
                     }
                     if (data_uri != null) {
@@ -1430,12 +1454,25 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
     }
 
     @Override
-    public void onPointerCaptureChanged(boolean hasCapture) {
-
+    public void onPositionDiscontinuity(int reason) {
+        if(reason == Player.DISCONTINUITY_REASON_PERIOD_TRANSITION){
+            Log.d("disconi",reason+" ");
+            player.setPlayWhenReady(false);
+        }
     }
 
     @Override
     public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
+        Log.d("syges.", "otpr");
+        try {
+            if (ids.size() != 0) {
+                requstByVideo(ids.get(player.getCurrentWindowIndex()));
+                player.setPlayWhenReady(true);
+                Log.d("ids", ids.get(player.getCurrentWindowIndex()) + "");
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
     }
 

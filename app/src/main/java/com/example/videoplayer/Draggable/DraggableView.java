@@ -179,7 +179,7 @@ public class DraggableView extends RelativeLayout {
     }
 
     public int getTopViewMarginRight() {
-       return transformer.getMarginRight();
+        return transformer.getMarginRight();
     }
 
     /**
@@ -277,7 +277,7 @@ public class DraggableView extends RelativeLayout {
      * @return true if the view is minimized.
      */
     public boolean isMinimized() {
-        return isDragViewAtBottom() && isDragViewAtRight()&&!isClosed();
+        return isDragViewAtBottom() && isDragViewAtRight() && !isClosed();
     }
 
     /**
@@ -348,12 +348,21 @@ public class DraggableView extends RelativeLayout {
         return viewDragHelper.shouldInterceptTouchEvent(ev) || interceptTap;
     }
 
+
+    public void cancelHelper(){
+        viewDragHelper.cancel();
+    }
+
     /**
      * Override method to dispatch touch event to the dragged view.
      *
      * @param ev captured.
      * @return true if the touch event is realized over the drag or second view.
      */
+
+
+
+
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
         boolean isDragViewHit = isViewHit(dragView, (int) ev.getX(), (int) ev.getY());
@@ -629,8 +638,7 @@ public class DraggableView extends RelativeLayout {
                     && screenY >= viewLocation[1]
                     && screenY < viewLocation[1] + (view.getHeight() - transformer.getMarginBottom());
         } else {
-
-            Log.d("enabled",(screenY < viewLocation[1] + (view.getHeight() - 100))+"");
+            Log.d("enabled", (screenY < viewLocation[1] + (view.getHeight() - 100)) + "");
             return screenX >= viewLocation[0]
                     && screenX < viewLocation[0] + view.getWidth()
                     && screenY >= viewLocation[1]
@@ -721,7 +729,7 @@ public class DraggableView extends RelativeLayout {
         return false;
     }
 
-    public void setClickablePx(){
+    public void setClickablePx() {
 
     }
 

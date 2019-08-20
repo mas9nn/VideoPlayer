@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.videoplayer.Common.Common;
 import com.example.videoplayer.Models.FollowedItems;
 import com.example.videoplayer.R;
 import com.squareup.picasso.Picasso;
