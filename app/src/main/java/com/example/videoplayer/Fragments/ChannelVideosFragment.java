@@ -23,7 +23,7 @@ import com.android.volley.toolbox.Volley;
 import com.example.videoplayer.Adapters.MainPageAdapter;
 import com.example.videoplayer.Common.Common;
 import com.example.videoplayer.Interfaces.ItemSelecListener;
-import com.example.videoplayer.MainActivity;
+import com.example.videoplayer.Activities.MainActivity;
 import com.example.videoplayer.Models.MainPageItems;
 import com.example.videoplayer.R;
 import com.facebook.shimmer.ShimmerFrameLayout;

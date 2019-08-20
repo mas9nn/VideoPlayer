@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="?attr/back"
     android:paddingTop="8dp"
     android:paddingBottom="8dp"
     android:orientation="vertical">
@@ -33,9 +34,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
-                android:background="@android:color/black"
+                android:background="?attr/back"
                 android:text="10:00"
-                android:textColor="@android:color/white"
+                android:textColor="?attr/textColor"
                 app:layout_constraintBottom_toBottomOf="@id/preview"
                 app:layout_constraintRight_toRightOf="@id/preview" />
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -53,7 +54,7 @@
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
                 android:src="@drawable/ic_person_black_24dp"
-                android:tint="@android:color/black"
+                android:tint="?attr/tintColor"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent" />
             <ImageButton
@@ -62,6 +63,7 @@
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
                 android:src="@drawable/ic_more_vert_black_24dp"
+                android:tint="?attr/tintColor"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toTopOf="parent"/>
 
@@ -70,6 +72,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
+                android:textColor="?attr/textColor"
                 android:text="1500"
                 app:layout_constraintLeft_toRightOf="@id/viewers"
                 app:layout_constraintTop_toTopOf="@id/viewers" />
@@ -78,6 +81,7 @@
                 android:layout_width="1dp"
                 android:layout_height="0dp"
                 android:layout_marginLeft="5dp"
+                android:textColor="?attr/textColor"
                 android:background="@android:color/darker_gray"
                 app:layout_constraintBottom_toBottomOf="@id/count"
                 app:layout_constraintLeft_toRightOf="@id/count"
@@ -87,6 +91,7 @@
                 android:id="@+id/day"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:textColor="?attr/textColor"
                 android:layout_marginLeft="5dp"
                 android:text="18 chasov nazad"
                 app:layout_constraintRight_toLeftOf="@id/vert"
@@ -98,12 +103,13 @@
                 android:layout_height="wrap_content"
                 android:text="FUNBOX"
                 app:layout_constraintLeft_toLeftOf="parent"
-
+                android:textColor="?attr/textColor"
                 app:layout_constraintBottom_toTopOf="@id/viewers" />
 
             <TextView
                 android:layout_marginTop="4dp"
                 android:id="@+id/name_of_video"
+                android:textColor="?attr/textColor"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:text="SHORT NEWS"

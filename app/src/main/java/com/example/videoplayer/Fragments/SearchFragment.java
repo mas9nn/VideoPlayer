@@ -1,5 +1,6 @@
 package com.example.videoplayer.Fragments;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,7 +23,7 @@ import com.android.volley.toolbox.Volley;
 import com.example.videoplayer.Adapters.ListViewAdapter;
 import com.example.videoplayer.Adapters.PanelAdapter;
 import com.example.videoplayer.Interfaces.ItemSelecListener;
-import com.example.videoplayer.MainActivity;
+import com.example.videoplayer.Activities.MainActivity;
 import com.example.videoplayer.Models.MainPageItems;
 import com.example.videoplayer.R;
 
@@ -31,6 +32,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,18 +47,20 @@ public class SearchFragment extends Fragment implements ItemSelecListener {
     ItemSelecListener itemSelecListenerl;
     List<MainPageItems> items = new ArrayList<>();
     PanelAdapter adapter;
+    SharedPreferences pref;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_search, null);
         listView = v.findViewById(R.id.listview);
-
+        pref = getContext().getSharedPreferences("MyPref", 0);
         recyclerView = v.findViewById(R.id.videos_in_search);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         listView.setDivider(null);
         listView.setDividerHeight(0);
         itemSelecListenerl = this;
-
+        savedChoises();
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
@@ -66,6 +70,19 @@ public class SearchFragment extends Fragment implements ItemSelecListener {
             }
         });
         return v;
+    }
+
+    public void savedChoises() {
+        if (pref.getString("set", null) != null) {
+            choices.clear();
+            String csvList = pref.getString("set","");
+            String[] items = csvList.split("`,/-");
+            Collections.addAll(choices, items);
+            Collections.reverse(choices);
+            Log.d("dsadsa",choices+"");
+            listViewAdapter = new ListViewAdapter(getContext(), choices);
+            listView.setAdapter(listViewAdapter);
+        }
     }
 
     public void getVideos(String query) {
@@ -122,20 +139,23 @@ public class SearchFragment extends Fragment implements ItemSelecListener {
         Volley.newRequestQueue(getContext()).add(stringRequest);
     }
 
-    public void setVisible(int visibility){
-        if(visibility == View.GONE){
+    public void setVisible(int visibility) {
+        if (visibility == View.GONE) {
             recyclerView.setVisibility(View.VISIBLE);
-        }else {
+        } else {
             recyclerView.setVisibility(View.GONE);
         }
         listView.setVisibility(visibility);
+        Log.d("visibility",listView.getVisibility()+" ");
     }
+
     public void getChoices(String query) {
 
 //        listViewAdapter.clearItems();
-        if (listViewAdapter!=null){
+        if (listViewAdapter != null) {
             listViewAdapter.notifyDataSetChanged();
         }
+
         String requestUrl = "https://video.orzu.org/api/v1.0/?type=search_videos&keyword=" + query;
         StringRequest stringRequest = new StringRequest(Request.Method.POST, requestUrl, new Response.Listener<String>() {
             @Override
@@ -180,8 +200,8 @@ public class SearchFragment extends Fragment implements ItemSelecListener {
     @Override
     public void onItemSelectedListener(View view, int position) {
         try {
-            ((MainActivity)getActivity()).changePostion();
-            ((MainActivity)getActivity()).MaximizePanel(items.get(position).getUrl(),items,position);
+            ((MainActivity) getActivity()).changePostion();
+            ((MainActivity) getActivity()).MaximizePanel(items.get(position).getUrl(), items, position);
         } catch (JSONException e) {
             e.printStackTrace();
         }

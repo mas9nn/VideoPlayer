@@ -13,7 +13,6 @@ import com.example.videoplayer.R;
 import com.example.videoplayer.ViewPager.CustomViewPager;
 import com.google.android.material.tabs.TabLayout;
 
-
 public class ChannelFragment extends Fragment {
 
     TabLayout tabs;
@@ -23,13 +22,14 @@ public class ChannelFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_channel, null);
         tabs = v.findViewById(R.id.tabs);
         viewPager = v.findViewById(R.id.channel_pager);
-        ViewPagerAdapter adapter = new ViewPagerAdapter(getFragmentManager());
+        ViewPagerAdapter adapter = new ViewPagerAdapter(getChildFragmentManager());
         adapter.addFragment(new ChannelVideosFragment(), "Видео");
         adapter.addFragment(new CategoryFragment(), "Плейлисты");
         adapter.addFragment(new FollowedFragment(), "Мне Нравится");
         adapter.addFragment(new LoginFragment(), "Описание");
         viewPager.setAdapter(adapter);
         viewPager.setCurrentItem(0);
+        adapter.notifyDataSetChanged();
         tabs.setupWithViewPager(viewPager);
         return v;
     }

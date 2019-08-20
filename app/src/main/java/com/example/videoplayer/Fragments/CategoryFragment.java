@@ -2,11 +2,10 @@ package com.example.videoplayer.Fragments;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -19,9 +18,8 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.videoplayer.Adapters.CategoriesAdapter;
-import com.example.videoplayer.Adapters.MainPageAdapter;
 import com.example.videoplayer.Interfaces.ItemSelecListener;
-import com.example.videoplayer.MainActivity;
+import com.example.videoplayer.Activities.MainActivity;
 import com.example.videoplayer.Models.CategoryItem;
 import com.example.videoplayer.R;
 
@@ -42,6 +40,7 @@ public class CategoryFragment extends Fragment implements ItemSelecListener {
     ItemSelecListener itemSelecListener;
 
 
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -50,8 +49,14 @@ public class CategoryFragment extends Fragment implements ItemSelecListener {
         pref = getActivity().getApplicationContext().getSharedPreferences("MyPref", 0);
         categoriesRec = v.findViewById(R.id.categories);
         categoriesRec.setLayoutManager(new GridLayoutManager(getContext(), 3));
+
         getCategories();
         return v;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
     }
 
     public void getCategories() {
@@ -114,4 +119,5 @@ public class CategoryFragment extends Fragment implements ItemSelecListener {
     public void onClick(View view) {
 
     }
+
 }

@@ -1,14 +1,19 @@
-package com.example.videoplayer;
+package com.example.videoplayer.Activities;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.app.Dialog;
 import android.content.ActivityNotFoundException;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Point;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -18,9 +23,12 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+
+import com.etebarian.meowbottomnavigation.MeowBottomNavigation;
 import com.example.videoplayer.Adapters.PanelAdapter;
 import com.example.videoplayer.Adapters.ViewPagerAdapter;
 import com.example.videoplayer.Common.Common;
+
 import com.example.videoplayer.Draggable.DraggableListener;
 import com.example.videoplayer.Draggable.DraggableView;
 import com.example.videoplayer.Fragments.CategoryFragment;
@@ -30,10 +38,13 @@ import com.example.videoplayer.Fragments.FollowedFragment;
 import com.example.videoplayer.Fragments.LoginFragment;
 import com.example.videoplayer.Fragments.MainFragment;
 import com.example.videoplayer.Fragments.SearchFragment;
+import com.example.videoplayer.Fragments.SettingsFragment;
 import com.example.videoplayer.Interfaces.ItemSelecListener;
 import com.example.videoplayer.Models.MainPageItems;
 
 import com.example.videoplayer.Player.PlayerView;
+import com.example.videoplayer.R;
+import com.example.videoplayer.Receivers.NetworkChangeReceiver;
 import com.example.videoplayer.ViewPager.CustomViewPager;
 import com.facebook.shimmer.ShimmerFrameLayout;
 import com.google.android.exoplayer2.C;
@@ -61,7 +72,6 @@ import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.squareup.picasso.Picasso;
 
@@ -91,6 +101,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewAnimationUtils;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
@@ -103,6 +114,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -113,41 +125,23 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
+
+import kotlin.Unit;
+import kotlin.jvm.functions.Function1;
 
 public class MainActivity extends AppCompatActivity implements View.OnTouchListener, ItemSelecListener, Player.EventListener {
     private FragmentManager fragmentManager;
-    private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
-            = new BottomNavigationView.OnNavigationItemSelectedListener() {
-
-        @Override
-        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-            switch (item.getItemId()) {
-                case R.id.main:
-                    count_of_adapter = 1;
-                    viewPager.setCurrentItem(0);
-                    return true;
-                case R.id.chanels:
-                    viewPager.setCurrentItem(1);
-                    return true;
-                case R.id.following:
-                    viewPager.setCurrentItem(2);
-                    return true;
-                case R.id.account:
-                    viewPager.setCurrentItem(3);
-                    return true;
-            }
-            return false;
-        }
-    };
     TextView name, views, likes, dislikes, channel_name, followers, date, name_of_video_bottom, name_of_category, name_of_video, channel_names, title;
 
     ItemSelecListener itemSelecListener;
 
     DraggableView panel;
-
+    Handler handler;
     RecyclerView recyclerInPanel;
     ImageButton like, dislike;
     ImageView hide, cancel, voice;
@@ -156,7 +150,6 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
     List<String> quality_has = new ArrayList<>();
     List<MainPageItems> suggestions = new ArrayList<>();
     SharedPreferences pref;
-    BottomNavigationView navView;
     DefaultTrackSelector trackSelector;
     String waterUrl = "https://video.orzu.org/upload/videos/2019/06/1DZjZiEBOEfGfcAslyHh_25_38aa4abb775fd1e9d30afdbf21561613_video_240p_converted.mp4";
     String id = "";
@@ -180,12 +173,41 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
     boolean logedIn;
     boolean liked = false;
     boolean followed = false;
-    boolean disliked = false;
     Toolbar tol;
     FrameLayout searcher;
     int count_of_adapter = 0;
     int clicks;
-
+    int X, Y, cx, cy;
+    BroadcastReceiver receiver;
+    ProgressBar progressBar;
+    LinearLayout layoutBottomSheet;
+    Menu menu;
+    BottomSheetBehavior sheetBehavior;
+    EditText searchView;
+    double topView;
+    CustomViewPager viewPager;
+    ShimmerFrameLayout shimmer;
+    private final int REQ_CODE = 100;
+    Uri data_uri;
+    Switch aSwitch;
+    Set<String> set = new LinkedHashSet<String>();
+    List<String> choises = new ArrayList<>();
+    SharedPreferences.Editor editor;
+    MeowBottomNavigation meowBottomNavigation;
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case REQ_CODE: {
+                if (resultCode == RESULT_OK && null != data) {
+                    ArrayList result = data
+                            .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                    searchView.setText(result.get(0).toString());
+                }
+                break;
+            }
+        }
+    }
     @Override
     public void onBackPressed() {
         Log.d("asd", searcher.getVisibility() + " " + panel.isClosedAtRight());
@@ -211,46 +233,68 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             super.onBackPressed();
         }
     }
-
-    ProgressBar progressBar;
-    LinearLayout layoutBottomSheet;
-    Menu menu;
-    BottomSheetBehavior sheetBehavior;
-    EditText searchView;
-    double topView;
-    CustomViewPager viewPager;
-    ShimmerFrameLayout shimmer;
-    private final int REQ_CODE = 100;
-    Uri data_uri;
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode) {
-            case REQ_CODE: {
-                if (resultCode == RESULT_OK && null != data) {
-                    ArrayList result = data
-                            .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-                    searchView.setText(result.get(0).toString());
-                }
-                break;
-            }
-        }
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        pref = getApplicationContext().getSharedPreferences("MyPref", 0);
+        if (pref.getBoolean("dark", false)) {
+            setTheme(R.style.DarkTheme);
+        } else {
+            setTheme(R.style.AppTheme);
+        }
         setContentView(R.layout.activity_main);
+
         viewPager = (CustomViewPager) findViewById(R.id.main_container);
-        ViewPagerAdapter adapter = new ViewPagerAdapter(MainActivity.this.getSupportFragmentManager());
+        ViewPagerAdapter adapter = new ViewPagerAdapter(super.getSupportFragmentManager());
         adapter.addFragment(new MainFragment(), "MainFragment");
         adapter.addFragment(new CategoryFragment(), "CategoryFragment");
         adapter.addFragment(new FollowedFragment(), "FollowedFragment");
         adapter.addFragment(new LoginFragment(), "LoginFragment");
         viewPager.setAdapter(adapter);
         viewPager.setPagingEnabled(false);
+        handler = new Handler();
+
+
+        editor = pref.edit();
+
+        meowBottomNavigation = findViewById(R.id.meow);
+        meowBottomNavigation.add(new MeowBottomNavigation.Model(1, R.drawable.ic_home_black_24dp));
+        meowBottomNavigation.add(new MeowBottomNavigation.Model(2, R.drawable.ic_dashboard_black_24dp));
+        meowBottomNavigation.add(new MeowBottomNavigation.Model(3, R.drawable.ic_subscriptions));
+        meowBottomNavigation.add(new MeowBottomNavigation.Model(4, R.drawable.ic_account_circle_black_24dp));
+        meowBottomNavigation.show(1, true);
+        meowBottomNavigation.setOnShowListener(new Function1<MeowBottomNavigation.Model, Unit>() {
+            @Override
+            public Unit invoke(MeowBottomNavigation.Model model) {
+                if (model.getId() == 1) {
+                    Log.d("position", model.getId() + "");
+                    count_of_adapter = 1;
+                    viewPager.setCurrentItem(0);
+
+                } else if (model.getId() == 2) {
+                    Log.d("position", model.getId() + "");
+                    viewPager.setCurrentItem(1);
+                    Log.d("minim", panel.isMinimized() + "");
+                    if (!pref.getBoolean("isLoged", false)) {
+                        viewPager.getAdapter().notifyDataSetChanged();
+                    }
+                } else if (model.getId() == 3) {
+                    Log.d("position", model.getId() + "");
+                    viewPager.setCurrentItem(2);
+                    if (!pref.getBoolean("isLoged", false)) {
+                        viewPager.getAdapter().notifyDataSetChanged();
+                    }
+                } else if (model.getId() == 4) {
+                    Log.d("position", model.getId() + "");
+                    viewPager.setCurrentItem(3);
+                    if (!pref.getBoolean("isLoged", false)) {
+                        viewPager.getAdapter().notifyDataSetChanged();
+                    }
+                }
+                return null;
+            }
+        });
+
 
         quality.add("240p");
         quality.add("360p");
@@ -260,9 +304,11 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         quality.add("2048p");
         quality.add("4096p");
 
-        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
-        navView = findViewById(R.id.navigation);
-        navView.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        receiver = new NetworkChangeReceiver();
+        registerReceiver(receiver,new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+
+        viewPager.setOffscreenPageLimit(0);
+        //  AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
         fragmentManager = getSupportFragmentManager();
         recyclerInPanel = findViewById(R.id.recycler_in_panel);
         recyclerInPanel.setLayoutManager(new LinearLayoutManager(this));
@@ -301,6 +347,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         hide.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 if (hidable.getVisibility() == View.GONE) {
                     hide.setImageResource(R.drawable.ic_keyboard_arrow_up_black_24dp);
                     hidable.setVisibility(View.VISIBLE);
@@ -342,7 +389,9 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                 voice.setVisibility(View.VISIBLE);
                 getSupportActionBar().setDisplayHomeAsUpEnabled(true);
                 getSupportActionBar().setDisplayShowHomeEnabled(true);
+                tol.setNavigationIcon(R.drawable.ic_keyboard_back);
                 tol.inflateMenu(R.menu.second_search);
+                showWithRevealEffect(searcher);
                 searchView.addTextChangedListener(new TextWatcher() {
                     @Override
                     public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -353,7 +402,13 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                     public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                         if (charSequence.length() >= 4) {
                             SearchFragment lastSMSFragment = (SearchFragment) getSupportFragmentManager().findFragmentByTag("categoryVideos");
+                            assert lastSMSFragment != null;
                             lastSMSFragment.getChoices(charSequence.toString());
+                            lastSMSFragment.setVisible(View.VISIBLE);
+                        } else if (charSequence.length() > 0 && charSequence.length() < 4) {
+                            SearchFragment lastSMSFragment = (SearchFragment) getSupportFragmentManager().findFragmentByTag("categoryVideos");
+                            assert lastSMSFragment != null;
+                            lastSMSFragment.savedChoises();
                             lastSMSFragment.setVisible(View.VISIBLE);
                         }
                     }
@@ -367,6 +422,34 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                     @Override
                     public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
                         if (i == EditorInfo.IME_ACTION_DONE) {
+                            if (pref.getString("set", null) == null) {
+                                choises.add(textView.getText().toString());
+                                StringBuilder csvList = new StringBuilder();
+                                for (String s : choises) {
+                                    csvList.append(s);
+                                    csvList.append("`,/-");
+                                }
+                                editor.putString("set", csvList.toString());
+                                editor.commit();
+                                Log.d("asd", set + "if");
+                            } else {
+                                String csvList = pref.getString("set", "");
+                                choises.clear();
+                                String[] items = csvList.split("`,/-");
+                                for (int j = 0; j < items.length; j++) {
+                                    choises.add(items[j]);
+                                }
+                                choises.add(textView.getText().toString());
+                                StringBuilder csv = new StringBuilder();
+                                for (String s : choises) {
+                                    csv.append(s);
+                                    csv.append("`,/-");
+                                }
+                                editor.putString("set", csv.toString());
+                                editor.commit();
+                                Log.d("asd", csv + "else");
+                            }
+                            Log.d("asd", pref.getString("set", null) + "");
                             SearchFragment lastSMSFragment = (SearchFragment) getSupportFragmentManager().findFragmentByTag("categoryVideos");
                             lastSMSFragment.getVideos(textView.getText().toString());
                             lastSMSFragment.setVisible(View.GONE);
@@ -385,7 +468,6 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                 searchView.requestFocus();
                 InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                 imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
-                searcher.setVisibility(View.VISIBLE);
             }
         });
         sheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
@@ -501,7 +583,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                 panel.setTopViewMarginBottom((int) (layout.getHeight() + px + panel.getTopViewMarginRight()));
             }
         });
-        navView.setSelectedItemId(R.id.main);
+
         panel.setDraggableListener(new DraggableListener() {
             @Override
             public void onMaximized() {
@@ -517,9 +599,10 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             public void onMinimized() {
                 if (exoPlayerView != null) {
                     exoPlayerView.hideController();
+                    // handler.removeCallbacks();
                     panel.setClickToMaximizeEnabled(true);
                     panel.setTopViewHeight((int) topView);
-                    Log.d("asd", panel.getTopView() + "");
+                    Log.d("asdd", panel.getTopView() + "");
                 }
             }
 
@@ -560,26 +643,87 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         }
     }
 
+    private void showWithRevealEffect(View view) {
+        cx = X;
+        cy = Y;
+        Log.d("Asdas", "log");
+        // get the final radius for the clipping circle
+        float finalRadius = (float) Math.hypot(view.getWidth(), view.getHeight());
 
-    public void openChannel(String channel_name,String id_channel){
+        // create the animator for this view (the start radius is zero)
+        Animator anim =
+                ViewAnimationUtils.createCircularReveal(view, cx, cy, 0, finalRadius);
+        anim.setDuration(200);
+
+        // make the view visible and start the animation
+        view.setVisibility(View.VISIBLE);
+        anim.start();
+    }
+
+
+    private void hideWithRevealEffect(final View view) {
+
+        // get the initial radius for the clipping circle
+        float initialRadius = (float) Math.hypot(view.getWidth(), view.getHeight());
+
+        // create the animation (the final radius is zero)
+        Animator anim =
+                ViewAnimationUtils.createCircularReveal(view, cx, cy, initialRadius, 0);
+
+        // make the view invisible when the animation is done
+        anim.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                view.setVisibility(View.GONE);
+            }
+        });
+        anim.setDuration(200);
+        // start the animation
+        anim.start();
+    }
+
+    public void openChannel(String channel_name, String id_channel) {
+        showWithRevealEffect(searcher);
         Common.channelId = id_channel;
         fragmentManager.beginTransaction().replace(R.id.searcher, new ChannelFragment(), "categoryVideos").commit();
-        searcher.setVisibility(View.VISIBLE);
         tol.getMenu().clear();
         title.setVisibility(View.VISIBLE);
         title.setText(channel_name);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        tol.setNavigationIcon(R.drawable.ic_keyboard_back);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
     }
 
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        // Your code here
+        X = (int) ev.getX();
+        Y = (int) ev.getY();
+        return super.dispatchTouchEvent(ev);
+    }
+
     public void openCategory(String id, String name) {
+        showWithRevealEffect(searcher);
         id_of_category = id;
         fragmentManager.beginTransaction().replace(R.id.searcher, new CategoryVideosFragment(), "categoryVideos").commit();
-        searcher.setVisibility(View.VISIBLE);
         tol.getMenu().clear();
         title.setVisibility(View.VISIBLE);
         title.setText(name);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        tol.setNavigationIcon(R.drawable.ic_keyboard_back);
+
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+    }
+
+    public void openSettings() {
+        showWithRevealEffect(searcher);
+        fragmentManager.beginTransaction().replace(R.id.searcher, new SettingsFragment(), "categoryVideos").commit();
+        tol.getMenu().clear();
+        title.setVisibility(View.VISIBLE);
+        title.setText("Настройки");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        tol.setNavigationIcon(R.drawable.ic_keyboard_back);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
     }
 
@@ -592,9 +736,16 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         if (item.getItemId() == android.R.id.home) {
             homePressed();
         }
-        if (item.getItemId() == R.id.action_micro) {
+        if (item.getItemId() == R.id.action_filter) {
             final Dialog dialog = new Dialog(this);
             dialog.setContentView(R.layout.custom_dialog);
+            Button cancel = dialog.findViewById(R.id.cancel);
+            cancel.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    dialog.dismiss();
+                }
+            });
             dialog.show();
         }
         return super.onOptionsItemSelected(item);
@@ -602,9 +753,9 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
 
     private void homePressed() {
         title.setVisibility(View.GONE);
+        hideWithRevealEffect(searcher);
         Fragment fragment = fragmentManager.findFragmentByTag("categoryVideos");
-        fragmentManager.beginTransaction().remove(fragment).commitAllowingStateLoss();
-        searcher.setVisibility(View.GONE);
+        fragmentManager.beginTransaction().remove(fragment).commit();
         tol.getMenu().clear();
         search.setVisibility(View.VISIBLE);
         if (searchView != null) {
@@ -785,6 +936,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                 Log.d("dddd", "onStop");
             }
         });
+
         ImageButton next = exoPlayerView.findViewById(R.id.exo_next);
         next.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -849,7 +1001,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         TextView forward = findViewById(R.id.forward);
         TextView forward_txt = findViewById(R.id.frw_text);
 
-        Handler handler = new Handler();
+
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
@@ -859,7 +1011,11 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                     if (exoPlayerView.isControllerVisible()) {
                         exoPlayerView.hideController();
                     } else {
+
+                        exoPlayerView.hideController();
+
                         exoPlayerView.showController();
+
                     }
                     clicks = 0;
                 } else {
@@ -874,13 +1030,17 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         final boolean[] frwd = {false};
         final boolean[] bck = {false};
         clicks = 0;
+        panel.computeScroll();
+        panel.setTouchEnabled(false);
         exoPlayerView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 switch (motionEvent.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
+                    case MotionEvent.ACTION_UP:
+                        exoPlayerView.enableController();
                         if (motionEvent.getX() > exoPlayerView.getWidth() / 2) {
-                            if(bck[0]){
+                            Log.d("minim", panel.isMinimized() + "");
+                            if (bck[0]) {
                                 clicks = 0;
                             }
                             frwd[0] = true;
@@ -891,22 +1051,22 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                             if (clicks == 1) {
                                 last_click[0] = SystemClock.elapsedRealtime();
                             }
-                            if (clicks >= 2 & SystemClock.elapsedRealtime() - last_click[0] < 500) {
+                            if (clicks >= 2 & SystemClock.elapsedRealtime() - last_click[0] < 350) {
                                 Log.d("asdasdd", SystemClock.elapsedRealtime() - last_click[0] + "");
                                 last_click[0] = SystemClock.elapsedRealtime();
                             }
                             if (clicks >= 2) {
-                                forward.setText(((clicks - 1) * 5) + "");
+                                forward.setText(((clicks - 1) * pref.getInt("forward", 5)) + "");
                                 forward.setVisibility(View.VISIBLE);
                                 forward_txt.setVisibility(View.VISIBLE);
                                 exoPlayerView.hideController();
 
-                                player.seekTo(player.getCurrentPosition() + 5000);
+                                player.seekTo(player.getCurrentPosition() + (pref.getInt("forward", 5) * 1000));
                             }
                             handler.removeCallbacks(runnable);
-                            handler.postDelayed(runnable, 500);
+                            handler.postDelayed(runnable, 350);
                         } else {
-                            if(frwd[0]){
+                            if (frwd[0]) {
                                 clicks = 0;
                             }
                             bck[0] = true;
@@ -918,21 +1078,25 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                                 last_click[0] = SystemClock.elapsedRealtime();
                             }
 
-                            if (clicks >= 2 & SystemClock.elapsedRealtime() - last_click[0] < 500) {
+                            if (clicks >= 2 & SystemClock.elapsedRealtime() - last_click[0] < 350) {
                                 Log.d("asdasdd", SystemClock.elapsedRealtime() - last_click[0] + "");
                                 last_click[0] = SystemClock.elapsedRealtime();
                             }
 
                             if (clicks >= 2) {
                                 exoPlayerView.hideController();
-                                back.setText(((clicks - 1) * 5) + "");
+                                back.setText(((clicks - 1) * pref.getInt("backward", 5)) + "");
                                 back.setVisibility(View.VISIBLE);
                                 back_txt.setVisibility(View.VISIBLE);
-                                player.seekTo(player.getCurrentPosition() - 5000);
+                                player.seekTo(player.getCurrentPosition() - (pref.getInt("backward", 5) * 1000));
                             }
                             handler.removeCallbacks(runnable);
-                            handler.postDelayed(runnable, 500);
+                            handler.postDelayed(runnable, 350);
                         }
+                        return true;
+                    case MotionEvent.ACTION_MOVE:
+                        Log.d("move", "moving");
+                        exoPlayerView.disableController();
                         return true;
                 }
                 return false;
@@ -950,6 +1114,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             name_of_video.setVisibility(View.GONE);
             channel_names.setVisibility(View.GONE);
         }
+
     }
 
 
@@ -959,7 +1124,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
 
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-            navView.setVisibility(View.GONE);
+            meowBottomNavigation.setVisibility(View.GONE);
             RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) exoPlayerView.getLayoutParams();
             params.width = params.MATCH_PARENT;
             params.height = params.MATCH_PARENT;
@@ -978,7 +1143,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
 
         } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
             this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN, WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
-            navView.setVisibility(View.VISIBLE);
+            meowBottomNavigation.setVisibility(View.VISIBLE);
             RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) exoPlayerView.getLayoutParams();
             params.width = params.MATCH_PARENT;
             Display display = getWindowManager().getDefaultDisplay();
@@ -1034,6 +1199,13 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             onPauseCalled = true;
             player.release();
         }
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        unregisterReceiver(receiver);
+        super.onDestroy();
     }
 
     @Override

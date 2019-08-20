@@ -4,7 +4,8 @@
     tools:context=".HomeActivity">
 
     <item
-        android:id="@+id/action_micro"
+        android:id="@+id/action_filter"
+
         android:title="micro"
         android:icon="@drawable/ic_tune_black_24dp"
         app:showAsAction="always" />

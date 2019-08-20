@@ -16,29 +16,36 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity
-            android:name=".MainActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize"
-            android:label="@string/app_name"
-            android:windowSoftInputMode="adjustPan"
-            android:screenOrientation="portrait">
+        <receiver android:name=".Receivers.NetworkChangeReceiver">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+            </intent-filter>
+        </receiver>
+        <activity android:name=".Activities.RegistrationActivity"></activity>
+        <activity
+            android:name=".Activities.MainActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize|uiMode"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"
+                    />
 
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
                 <data
                     android:host="video.orzu.org"
                     android:scheme="https" />
             </intent-filter>
         </activity>
-        <activity android:name=".RegistrationActivity">
-        </activity>
-
+        <activity android:name=".Activities.LoginActivity"></activity>
     </application>
 
 </manifest>

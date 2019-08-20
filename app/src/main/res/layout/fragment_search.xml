@@ -2,7 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white"
+    android:background="?attr/back"
     android:paddingRight="10dp"
     android:paddingLeft="10dp"
     android:orientation="vertical">
@@ -15,6 +15,7 @@
 
         <ListView
             android:id="@+id/listview"
+            android:background="?attr/back"
             android:layout_width="match_parent"
             android:layout_height="match_parent"></ListView>
     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -23,6 +24,7 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/videos_in_search"
         android:layout_width="match_parent"
+        android:background="?attr/back"
         android:layout_height="match_parent"
         android:visibility="gone"></androidx.recyclerview.widget.RecyclerView>
 

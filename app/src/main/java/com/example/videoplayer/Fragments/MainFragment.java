@@ -1,13 +1,20 @@
 package com.example.videoplayer.Fragments;
 
+import android.animation.Animator;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -21,7 +28,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.videoplayer.Adapters.MainPageAdapter;
 import com.example.videoplayer.Interfaces.ItemSelecListener;
-import com.example.videoplayer.MainActivity;
+import com.example.videoplayer.Activities.MainActivity;
 import com.example.videoplayer.Models.MainPageItems;
 import com.example.videoplayer.R;
 import com.facebook.shimmer.ShimmerFrameLayout;
@@ -33,6 +40,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 
 public class MainFragment extends Fragment implements ItemSelecListener, SwipeRefreshLayout.OnRefreshListener {
@@ -43,7 +51,7 @@ public class MainFragment extends Fragment implements ItemSelecListener, SwipeRe
     ShimmerFrameLayout shimmer;
     SwipeRefreshLayout mSwipeRefreshLayout;
     int count = 0;
-
+    ConstraintLayout containerr;
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -158,7 +166,7 @@ public class MainFragment extends Fragment implements ItemSelecListener, SwipeRe
                             pageItems.setUrl(object.getString("video_location"));
                             pageItems.setId(object.getString("video_id"));
                             if (!items.contains(pageItems)) {
-                                items.add(0,pageItems);
+                                items.add(0, pageItems);
                             }
                             adapter.notifyDataSetChanged();
                             mSwipeRefreshLayout.setRefreshing(false);

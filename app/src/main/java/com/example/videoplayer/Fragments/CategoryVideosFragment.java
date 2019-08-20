@@ -5,8 +5,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ListView;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -21,7 +19,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.videoplayer.Adapters.PanelAdapter;
 import com.example.videoplayer.Interfaces.ItemSelecListener;
-import com.example.videoplayer.MainActivity;
+import com.example.videoplayer.Activities.MainActivity;
 import com.example.videoplayer.Models.MainPageItems;
 import com.example.videoplayer.R;
 import com.facebook.shimmer.ShimmerFrameLayout;

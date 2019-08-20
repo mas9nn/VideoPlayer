@@ -310,6 +310,15 @@ public class PlayerView extends FrameLayout implements AdsLoader.AdViewProvider 
         }
     }
 
+
+    public void disableController(){
+        controller.setEnabled(false);
+    }
+
+    public void enableController() {
+        controller.setEnabled(true);
+    }
+
     /** Returns the player currently set on this view, or null if no player is set. */
     public Player getPlayer() {
         return player;

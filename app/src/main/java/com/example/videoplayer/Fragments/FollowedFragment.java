@@ -21,7 +21,7 @@ import com.android.volley.toolbox.Volley;
 import com.example.videoplayer.Adapters.FollowedAdapter;
 import com.example.videoplayer.Adapters.MainPageAdapter;
 import com.example.videoplayer.Interfaces.ItemSelecListener;
-import com.example.videoplayer.MainActivity;
+import com.example.videoplayer.Activities.MainActivity;
 import com.example.videoplayer.Models.FollowedItems;
 import com.example.videoplayer.Models.MainPageItems;
 import com.example.videoplayer.R;

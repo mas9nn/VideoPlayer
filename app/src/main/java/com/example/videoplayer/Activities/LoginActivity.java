@@ -1,5 +1,6 @@
-package com.example.videoplayer;
+package com.example.videoplayer.Activities;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
@@ -7,6 +8,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -16,22 +18,20 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.example.videoplayer.Adapters.PanelAdapter;
-import com.example.videoplayer.Models.MainPageItems;
+import com.example.videoplayer.R;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class RegistrationActivity extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity {
     EditText username;
     EditText password;
     Button login;
     SharedPreferences pref;
-
+    TextView lnkRegister;
     SharedPreferences.Editor editor ;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,10 +44,19 @@ public class RegistrationActivity extends AppCompatActivity {
         username = findViewById(R.id.txtEmail);
         password = findViewById(R.id.txtPwd);
         login = findViewById(R.id.btnLogin);
+        lnkRegister = findViewById(R.id.lnkRegister);
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 checkLogin();
+            }
+        });
+        lnkRegister.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(LoginActivity.this,RegistrationActivity.class);
+                startActivity(intent);
+                finish();
             }
         });
     }
@@ -90,7 +99,7 @@ public class RegistrationActivity extends AppCompatActivity {
             }
         };
 //make the request to your server as indicated in your request url
-        Volley.newRequestQueue(RegistrationActivity.this).add(stringRequest);
+        Volley.newRequestQueue(LoginActivity.this).add(stringRequest);
     }
 
 }

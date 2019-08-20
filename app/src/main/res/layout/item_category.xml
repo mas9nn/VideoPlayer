@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:padding="15dp"
+    android:background="?attr/back"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -20,6 +21,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
+        android:textColor="?attr/textColor"
         android:textAlignment="center"
         app:layout_constraintLeft_toLeftOf="@id/logo"
         android:text="Music"

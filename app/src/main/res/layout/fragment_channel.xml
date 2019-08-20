@@ -7,15 +7,16 @@
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabs"
-        android:background="@color/colorPrimary"
+        android:background="?attr/col"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
         app:tabGravity="fill"
         android:textAlignment="center"
         app:tabMode="scrollable"
-        app:tabSelectedTextColor="#000"
-        app:tabTextColor="@android:color/black" />
+        app:tabIndicatorColor="?attr/textColor"
+        app:tabSelectedTextColor="?attr/textColor"
+        app:tabTextColor="?attr/textColor" />
     <com.example.videoplayer.ViewPager.CustomViewPager
         android:id="@+id/channel_pager"
         android:layout_width="match_parent"

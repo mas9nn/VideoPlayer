@@ -1,4 +1,4 @@
-package com.example.videoplayer;
+package com.example.videoplayer.Activities;
 
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
@@ -17,6 +17,7 @@ import com.example.videoplayer.Draggable.DraggableView;
 import com.example.videoplayer.Interfaces.ItemSelecListener;
 import com.example.videoplayer.Models.MainPageItems;
 
+import com.example.videoplayer.R;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.SimpleExoPlayer;
