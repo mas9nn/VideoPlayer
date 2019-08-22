@@ -15,7 +15,7 @@
         app:layout_constraintWidth_percent="0.4">
 
         <ImageButton
-            android:id="@+id/exo_prev"
+            android:id="@+id/prev_btn"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_gravity="center"
@@ -24,7 +24,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -36,7 +36,7 @@
         app:layout_constraintWidth_percent="0.4">
 
         <ImageButton
-            android:id="@+id/exo_next"
+            android:id="@+id/next_btn"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:background="@android:color/transparent"

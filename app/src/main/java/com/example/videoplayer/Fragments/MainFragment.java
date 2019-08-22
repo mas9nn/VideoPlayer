@@ -27,6 +27,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.videoplayer.Adapters.MainPageAdapter;
+import com.example.videoplayer.Common.Common;
 import com.example.videoplayer.Interfaces.ItemSelecListener;
 import com.example.videoplayer.Activities.MainActivity;
 import com.example.videoplayer.Models.MainPageItems;
@@ -117,6 +118,7 @@ public class MainFragment extends Fragment implements ItemSelecListener, SwipeRe
     public void onItemSelectedListener(View view, int position) {
         try {
             ((MainActivity) getActivity()).changePostion();
+            Common.MainFragment = true;
             ((MainActivity) getActivity()).MaximizePanel(items.get(position).getUrl(), items, position);
         } catch (JSONException e) {
             e.printStackTrace();

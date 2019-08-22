@@ -2,7 +2,9 @@ package com.example.videoplayer.Activities;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+
 import android.app.Dialog;
+
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -12,7 +14,9 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+
 import android.graphics.Point;
+
 import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -25,6 +29,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import com.etebarian.meowbottomnavigation.MeowBottomNavigation;
+
 import com.example.videoplayer.Adapters.PanelAdapter;
 import com.example.videoplayer.Adapters.ViewPagerAdapter;
 import com.example.videoplayer.Common.Common;
@@ -46,8 +51,9 @@ import com.example.videoplayer.Player.PlayerView;
 import com.example.videoplayer.R;
 import com.example.videoplayer.Receivers.NetworkChangeReceiver;
 import com.example.videoplayer.ViewPager.CustomViewPager;
+
 import com.facebook.shimmer.ShimmerFrameLayout;
-import com.google.android.exoplayer2.C;
+
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.Player;
@@ -55,7 +61,6 @@ import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
 import com.google.android.exoplayer2.extractor.ExtractorsFactory;
 
-import com.google.android.exoplayer2.source.ConcatenatingMediaSource;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
 
@@ -72,13 +77,13 @@ import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
-import com.google.android.exoplayer2.video.VideoListener;
+
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
+
 import com.squareup.picasso.Picasso;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -87,7 +92,7 @@ import androidx.fragment.app.FragmentManager;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.provider.Settings;
@@ -127,11 +132,9 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 
 import kotlin.Unit;
 import kotlin.jvm.functions.Function1;
@@ -139,9 +142,8 @@ import kotlin.jvm.functions.Function1;
 public class MainActivity extends AppCompatActivity implements View.OnTouchListener, ItemSelecListener, Player.EventListener {
     private FragmentManager fragmentManager;
     TextView name, views, likes, dislikes, channel_name, followers, date, name_of_video_bottom, name_of_category, name_of_video, channel_names, title;
-
+    int margin = 0;
     ItemSelecListener itemSelecListener;
-
     DraggableView panel;
     Handler handler;
     RecyclerView recyclerInPanel;
@@ -157,7 +159,6 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
     String id = "";
     String url_of_data = "";
     String id_of_category = "";
-    String id_of_channel = "";
     String channel_id = "";
     PanelAdapter panelAdapter;
     private static final String APP_NAME = MainActivity.class.getSimpleName();
@@ -165,19 +166,17 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
     PlayerView exoPlayerView;
     MediaSource videoSource;
     MediaSource suggestion;
-    ConstraintLayout bottom_constraint, hidable;
-    ConcatenatingMediaSource mediaSource = new ConcatenatingMediaSource();
+    List<MediaSource> forAutoPlay = new ArrayList<>();
+    ConstraintLayout bottom_constraint, hidable, after_video_end;
     ImageView search, channel_logo, arrow;
     List<String> ids = new ArrayList<>();
     private boolean onPauseCalled = false;
-    int windowIndex, position;
+    int position;
     int lastPosition = -213;
-    boolean logedIn, notHim,autoplay;
-    boolean liked = false;
+    boolean logedIn, autoplay;
     boolean followed = false;
     Toolbar tol;
     FrameLayout searcher;
-    int count_of_adapter = 0;
     int clicks;
     int X, Y, cx, cy;
     BroadcastReceiver receiver;
@@ -192,10 +191,10 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
     private final int REQ_CODE = 100;
     Uri data_uri;
     Switch aSwitch;
-    Set<String> set = new LinkedHashSet<String>();
     List<String> choises = new ArrayList<>();
     SharedPreferences.Editor editor;
     MeowBottomNavigation meowBottomNavigation;
+    TextView name_of_vidos, channel_n;
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -248,8 +247,9 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             setTheme(R.style.AppTheme);
         }
         setContentView(R.layout.activity_main);
-
-        viewPager = (CustomViewPager) findViewById(R.id.main_container);
+        name_of_vidos = findViewById(R.id.name_of_videos);
+        channel_n = findViewById(R.id.channel_names);
+        viewPager = findViewById(R.id.main_container);
         ViewPagerAdapter adapter = new ViewPagerAdapter(super.getSupportFragmentManager());
         adapter.addFragment(new MainFragment(), "MainFragment");
         adapter.addFragment(new CategoryFragment(), "CategoryFragment");
@@ -258,7 +258,6 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         viewPager.setAdapter(adapter);
         viewPager.setPagingEnabled(false);
         handler = new Handler();
-
 
         editor = pref.edit();
 
@@ -273,7 +272,6 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             public Unit invoke(MeowBottomNavigation.Model model) {
                 if (model.getId() == 1) {
                     Log.d("position", model.getId() + "");
-                    count_of_adapter = 1;
                     viewPager.setCurrentItem(0);
 
                 } else if (model.getId() == 2) {
@@ -313,7 +311,6 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         registerReceiver(receiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
 
         viewPager.setOffscreenPageLimit(0);
-        //  AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
         fragmentManager = getSupportFragmentManager();
         recyclerInPanel = findViewById(R.id.recycler_in_panel);
         recyclerInPanel.setLayoutManager(new LinearLayoutManager(this));
@@ -349,6 +346,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         itemSelecListener = this;
         aSwitch = findViewById(R.id.next_video);
         tol = findViewById(R.id.toolbar);
+        after_video_end = findViewById(R.id.after_video_end);
         hide.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -363,14 +361,20 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             }
         });
 
+        aSwitch.setChecked(pref.getBoolean("autoplay", false));
+        autoplay = pref.getBoolean("autoplay", false);
 
         aSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                if(!b){
+                if (!b) {
                     autoplay = false;
-                }else{
+                    editor.putBoolean("autoplay", false);
+                    editor.commit();
+                } else {
                     autoplay = true;
+                    editor.putBoolean("autoplay", true);
+                    editor.commit();
                 }
             }
         });
@@ -448,7 +452,6 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                                 }
                                 editor.putString("set", csvList.toString());
                                 editor.commit();
-                                Log.d("asd", set + "if");
                             } else {
                                 String csvList = pref.getString("set", "");
                                 choises.clear();
@@ -513,32 +516,6 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             public void onSlide(@NonNull View bottomSheet, float slideOffset) {
             }
         });
-        like.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (liked) {
-                    liked = false;
-                    like.setImageResource(R.drawable.ic_favorite_black);
-                    int count_like = Integer.parseInt(likes.getText().toString());
-                    likes.setText((count_like - 1) + "");
-                    try {
-                        setLike(ids.get(player.getCurrentWindowIndex()), "up");
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                } else {
-                    liked = true;
-                    like.setImageResource(R.drawable.ic_favorite_blue);
-                    int count_like = Integer.parseInt(likes.getText().toString());
-                    likes.setText((count_like + 1) + "");
-                    try {
-                        setLike(ids.get(player.getCurrentWindowIndex()), "down");
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        });
         follow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -568,8 +545,11 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             public void onClick(View view) {
                 Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
                 sharingIntent.setType("text/plain");
-                sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "https://video.orzu.org/watch/" + ids.get(player.getCurrentWindowIndex()));
-                sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, "https://video.orzu.org/watch/" + ids.get(player.getCurrentWindowIndex()));
+                if (suggestions.size() != 0) {
+                    sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, "https://video.orzu.org/watch/" + ids.get(ids.size() - 2));
+                } else {
+                    sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, "https://video.orzu.org/watch/" + ids.get(ids.size() - 1));
+                }
                 startActivity(Intent.createChooser(sharingIntent, "share:"));
             }
         });
@@ -604,12 +584,10 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         panel.setDraggableListener(new DraggableListener() {
             @Override
             public void onMaximized() {
-                //exoPlayerView.showController();
                 panel.setClickToMaximizeEnabled(false);
                 panel.setClickToMinimizeEnabled(false);
                 Log.d("maxim", panel.getTopView() + "");
-                // constra.setEnabled(true);
-                // player.setPlayWhenReady(true);
+                exoPlayerView.performClick();
             }
 
             @Override
@@ -627,13 +605,14 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             public void onClosedToLeft() {
                 player.setPlayWhenReady(false);
                 panel.setVisibility(View.GONE);
-
+                releasePlayer();
             }
 
             @Override
             public void onClosedToRight() {
                 player.setPlayWhenReady(false);
                 panel.setVisibility(View.GONE);
+                releasePlayer();
             }
         });
 
@@ -644,21 +623,25 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             String string = data_uri + "";
             String[] parts = string.split("/");
             Log.d("data", parts[parts.length - 1] + "");
-
+            Common.MainFragment = false;
+            forAutoPlay.clear();
+            ids.clear();
+            margin = 1;
+            ids.add(parts[parts.length - 1]);
+            c = 0;
             hide.setImageResource(R.drawable.ic_keyboard_arrow_down_black_24dp);
             hidable.setVisibility(View.GONE);
             bottom_constraint.setVisibility(View.INVISIBLE);
             shimmer.setVisibility(View.VISIBLE);
             layoutBottomSheet.setVisibility(View.GONE);
             panel.setVisibility(View.VISIBLE);
-            ids.add(parts[parts.length-1]);
+            initPlayer();
             try {
-                requstByVideo(parts[parts.length - 1]);
-
+                requstByVideo(id);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-
+            lastPosition = position;
         }
     }
 
@@ -791,17 +774,22 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
     }
 
     public void MaximizePanel(String url, List<MainPageItems> items, int position) throws JSONException {
+        if (Common.MainFragment) {
+            Common.MainFragment = false;
+            forAutoPlay.clear();
+            ids.clear();
+        }
+
+        margin = 1;
+        id = items.get(position).getId();
+        ids.add(id);
+        c = 0;
         hide.setImageResource(R.drawable.ic_keyboard_arrow_down_black_24dp);
         hidable.setVisibility(View.GONE);
         bottom_constraint.setVisibility(View.INVISIBLE);
         shimmer.setVisibility(View.VISIBLE);
         layoutBottomSheet.setVisibility(View.GONE);
         panel.setVisibility(View.VISIBLE);
-        id = items.get(position).getId();
-        ids.add(id);
-        Log.d("items", items.size() + " " + position);
-       // requstByVideo(items.get(position).getId());
-        notHim = false;
         waterUrl = url;
 
         Log.d("positions", lastPosition + " " + position + " " + player);
@@ -812,7 +800,6 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         } else {
             panel.maximize();
         }
-        initBottomSheet(items);
         Log.d("url", url);
         lastPosition = position;
     }
@@ -830,15 +817,9 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
         suggestion = new ExtractorMediaSource(Uri.parse(url),
                 dataSourceFactory, extractorsFactory, null, null);
-
-        mediaSource.addMediaSource(suggestion);
+        forAutoPlay.add(suggestion);
         ids.add(suggestions.get(0).getId());
-    }
-
-
-    private void initBottomSheet(List<MainPageItems> items) {
-
-
+        Log.d("positions",forAutoPlay.size()+" "+ids.size());
     }
 
     @Override
@@ -878,19 +859,16 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         videoSource = new ExtractorMediaSource(Uri.parse(waterUrl),
                 dataSourceFactory, extractorsFactory, null, null);
 
-        mediaSource.addMediaSource(videoSource);
-
+        forAutoPlay.add(videoSource);
 
         player.addListener(this);
-        player.prepare(mediaSource);
-        if (mediaSource.getSize() != 1) {
-            player.seekTo(mediaSource.getSize() - 1, C.TIME_UNSET);
-        }
+        player.prepare(videoSource);
         if (onPauseCalled) {
             onPauseCalled = false;
-            player.seekTo(windowIndex, position);
+            player.seekTo(position);
             player.setPlayWhenReady(false);
         } else {
+            Log.wtf("sudapriwel", "da" + waterUrl);
             player.setPlayWhenReady(true);
         }
         ImageButton button = exoPlayerView.findViewById(R.id.fullscreen);
@@ -960,41 +938,33 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             }
         });
 
-        ImageButton next = exoPlayerView.findViewById(R.id.exo_next);
+        ImageButton next = exoPlayerView.findViewById(R.id.next_btn);
         next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                player.seekTo(player.getCurrentWindowIndex() + 1, C.POSITION_UNSET);
-//                try {
-//                    if (ids.size() != 1) {
-//                        requstByVideo(ids.get(player.getCurrentWindowIndex()));
-//                        notHim = false;
-//                        player.setPlayWhenReady(true);
-//                        Log.d("ids", ids.get(player.getCurrentWindowIndex()) + "");
-//                    }
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }
+                if (suggestions.size() != 0) {
+                    c = 0;
+                    margin = 1;
+                    player.prepare(forAutoPlay.get(forAutoPlay.size() - 1));
+                }
             }
         });
-        ImageButton previous = exoPlayerView.findViewById(R.id.exo_prev);
+        ImageButton previous = exoPlayerView.findViewById(R.id.prev_btn);
         previous.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (player.getCurrentWindowIndex() != 0) {
-                    player.seekTo(player.getCurrentWindowIndex() - 1, C.POSITION_UNSET);
-                    if (suggestions.size() != 0) {
-                        ids.remove(ids.size() - 1);
-                        mediaSource.removeMediaSource(mediaSource.getSize() - 1);
-                    }
-//                    try {
-//                        if (ids.size() != 1) {
-//                            requstByVideo(ids.get(player.getCurrentWindowIndex()));
-//                            notHim = false;
-//                        }
-//                    } catch (JSONException e) {
-//                        e.printStackTrace();
-//                    }
+                if (forAutoPlay.size() != 1 && suggestions.size() != 0) {
+                    c = 0;
+                    margin = 2;
+                    forAutoPlay.remove(forAutoPlay.size() - 1);
+                    ids.remove(ids.size() - 1);
+                    player.prepare(forAutoPlay.get(forAutoPlay.size() - 2));
+                    forAutoPlay.remove(forAutoPlay.size() - 1);
+                    ids.remove(ids.size() - 1);
+                } else {
+                    c = 0;
+                    margin = 2;
+                    player.prepare(forAutoPlay.get(forAutoPlay.size() - 2));
                 }
             }
         });
@@ -1055,13 +1025,29 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         final boolean[] frwd = {false};
         final boolean[] bck = {false};
         clicks = 0;
+        final int[] touch_count = {0};
+        final int[] left = new int[1];
+        final int[] right = new int[1];
+        final int[] left_last = new int[1];
+        final int[] right_last = new int[1];
         panel.computeScroll();
         panel.setTouchEnabled(false);
         exoPlayerView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 switch (motionEvent.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        Log.d("multitouch", "down" + motionEvent.getPointerCount());
+                        if (motionEvent.getPointerCount() == 2) {
+                            left[0] = (int) Math.min(motionEvent.getX(motionEvent.getPointerId(0)), motionEvent.getX(motionEvent.getPointerId(1)));
+                            right[0] = (int) Math.max(motionEvent.getX(motionEvent.getPointerId(0)), motionEvent.getX(motionEvent.getPointerId(1)));
+                            Log.d("multitouch", left[0] + " " + right[0]);
+                        }
+                        return true;
                     case MotionEvent.ACTION_UP:
+                        touch_count[0] = 0;
+                        Log.d("multitouch", "up" + motionEvent.getPointerCount());
+
                         exoPlayerView.enableController();
                         if (motionEvent.getX() > exoPlayerView.getWidth() / 2) {
                             Log.d("minim", panel.isMinimized() + "");
@@ -1121,10 +1107,26 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                         return true;
                     case MotionEvent.ACTION_MOVE:
                         Log.d("move", "moving");
+                        Log.d("multitouch", "down" + motionEvent.getPointerCount());
+                        if (motionEvent.getPointerCount() == 2 && touch_count[0] == 0) {
+                            touch_count[0]++;
+                            left[0] = (int) Math.min(motionEvent.getX(motionEvent.getPointerId(0)), motionEvent.getX(motionEvent.getPointerId(1)));
+                            right[0] = (int) Math.max(motionEvent.getX(motionEvent.getPointerId(0)), motionEvent.getX(motionEvent.getPointerId(1)));
+                            Log.d("multitouch", left[0] + " " + right[0]);
+                        }
+                        if (motionEvent.getPointerCount() == 2) {
+                            left_last[0] = (int) Math.min(motionEvent.getX(motionEvent.getPointerId(0)), motionEvent.getX(motionEvent.getPointerId(1)));
+                            right_last[0] = (int) Math.max(motionEvent.getX(motionEvent.getPointerId(0)), motionEvent.getX(motionEvent.getPointerId(1)));
+                            Log.d("multitouch", left_last[0] + " " + right_last[0]);
+                            int orientation = getResources().getConfiguration().orientation;
+                            if (left_last[0] > left[0]+250 && right_last[0]+250 < right[0] && orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
+                            }
+                        }
                         exoPlayerView.disableController();
                         return true;
                 }
-                return false;
+                return true;
             }
         });
         name_of_video = exoPlayerView.findViewById(R.id.video_name);
@@ -1160,8 +1162,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             panel.setTopViewHeight(height);
             Log.d("sad", "" + height);
             panel.setEnabled(false);
-            channel_names.setText(channel_name.getText());
-            name_of_video.setText(name.getText());
+
             name_of_video.setVisibility(View.VISIBLE);
             channel_names.setVisibility(View.VISIBLE);
 
@@ -1218,7 +1219,6 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         super.onPause();
         if (player != null) {
             Log.d("pause", "sad");
-            windowIndex = player.getCurrentWindowIndex();
             position = (int) player.getCurrentPosition();
             onPauseCalled = true;
             player.release();
@@ -1265,6 +1265,8 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                     likes.setText(data.getString("likes"));
                     dislikes.setText(data.getString("dislikes"));
                     channel_name.setText(owner.getString("first_name"));
+                    channel_names.setText(owner.getString("first_name"));
+                    name_of_video.setText(data.getString("title"));
                     Picasso.get().load(owner.getString("avatar")).into(channel_logo);
                     channel_id = owner.getString("id");
                     followers.setText(data.getString("dislikes"));
@@ -1328,19 +1330,16 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                         }
                     }
                     if (suggestions.size() != 0) {
-                        Log.d("syges", suggestions.get(0).getUrl());
+                        Log.d("syges", suggestions.get(0).getName());
                         addSuggestion(suggestions.get(0).getUrl());
                     }
                     if (data_uri != null) {
+                        data_uri = null;
                         waterUrl = url_of_data;
                         Log.d("positions", lastPosition + " " + position + " " + player);
-                        if (lastPosition != position) {
-                            releasePlayer();
-                            initPlayer();
-                            panel.maximize();
-                        } else {
-                            panel.maximize();
-                        }
+                        releasePlayer();
+                        initPlayer();
+                        panel.maximize();
                         lastPosition = position;
                     }
                     //       addSuggestion(suggestions.get(0).getUrl());
@@ -1446,43 +1445,94 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         try {
             lastPosition = -123;
             Log.d("items", suggestions.get(position).getId() + "");
+            ids.remove(ids.size() - 1);
+            forAutoPlay.remove(forAutoPlay.size() - 1);
+            player.setPlayWhenReady(true);
+            releasePlayer();
             MaximizePanel(suggestions.get(position).getUrl(), suggestions, position);
-
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
 
     @Override
-    public void onPositionDiscontinuity(int reason) {
-        if(reason == Player.DISCONTINUITY_REASON_PERIOD_TRANSITION){
-            Log.d("disconi",reason+" ");
-            player.setPlayWhenReady(false);
+    public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
+        Log.wtf("playbackState", playbackState + "");
+        if (playbackState == player.STATE_ENDED && autoplay && suggestions.size() != 0) {
+            Log.wtf("suggestion", suggestions.get(0).getPreview_image() + " " + suggestions.get(0).getName());
+            c = 0;
+            margin = 1;
+            after_video_end.setVisibility(View.VISIBLE);
+            ImageView prev = findViewById(R.id.previeww);
+            ImageView close = findViewById(R.id.close);
+            Picasso.get().load(suggestions.get(0).getPreview_image()).into(prev);
+            name_of_vidos.setText(suggestions.get(0).getName());
+            channel_n.setText(suggestions.get(0).getChannel_name());
+            TextView ready_text = findViewById(R.id.ready_text);
+            Button otmena = findViewById(R.id.otmena);
+            Button igrat = findViewById(R.id.igrat);
+
+            CountDownTimer timer = new CountDownTimer(10000, 1000) {
+
+                public void onTick(long millisUntilFinished) {
+                    ready_text.setText("" + millisUntilFinished / 1000);
+                }
+
+                public void onFinish() {
+                    after_video_end.setVisibility(View.GONE);
+                    player.prepare(forAutoPlay.get(forAutoPlay.size() - 1));
+                    player.setPlayWhenReady(true);
+                }
+            }.start();
+
+            close.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    timer.cancel();
+                    after_video_end.setVisibility(View.GONE);
+                }
+            });
+
+            otmena.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    timer.cancel();
+                    after_video_end.setVisibility(View.GONE);
+                }
+            });
+
+            igrat.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    timer.cancel();
+                    after_video_end.setVisibility(View.GONE);
+                    player.prepare(forAutoPlay.get(forAutoPlay.size() - 1));
+                    player.setPlayWhenReady(true);
+                }
+            });
         }
     }
+
+    int c = 0;
 
     @Override
     public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
-        Log.d("syges.", "otpr");
-        try {
-            if (ids.size() != 0) {
-                requstByVideo(ids.get(player.getCurrentWindowIndex()));
-                player.setPlayWhenReady(true);
-                Log.d("ids", ids.get(player.getCurrentWindowIndex()) + "");
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        Log.d("playerstate", player.getPlaybackState() + " " + forAutoPlay.size() + " " + ids.size());
+        if (player.getPlaybackState() == player.STATE_BUFFERING && c == 0) {
 
+            c++;
+            try {
+                requstByVideo(ids.get(ids.size() - margin));
+                player.setPlayWhenReady(true);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
     public void onPlayerError(ExoPlaybackException error) {
-        Log.e("errorPlayer", error.getMessage());
-        mediaSource.removeMediaSource(mediaSource.getSize() - 1);
-        ids.remove(ids.size() - 1);
-        player.prepare(mediaSource);
-        player.seekTo(mediaSource.getSize() - 1, -1);
+
     }
 
 }
