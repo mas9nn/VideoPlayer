@@ -174,6 +174,7 @@ public class ChannelVideosFragment extends Fragment implements ItemSelecListener
                     recyclerView.setVisibility(View.VISIBLE);
                 } catch (JSONException e) {
                     e.printStackTrace();
+
                 }
             }
         }, new Response.ErrorListener() {
@@ -183,6 +184,11 @@ public class ChannelVideosFragment extends Fragment implements ItemSelecListener
                 mSwipeRefreshLayout.setRefreshing(false);
                 shimmer.setVisibility(View.VISIBLE);
                 recyclerView.setVisibility(View.GONE);
+                try {
+                    sendWorkPostRequest();
+                } catch (JSONException e1) {
+                    e1.printStackTrace();
+                }
             }
         }) {
             @Override

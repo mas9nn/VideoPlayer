@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/all_time"
+        android:title="За все время"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/weak_ago"
+        android:title="За неделю"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/month_ago"
+        android:title="За месяц"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/year_ago"
+        android:title="За год"
+        app:showAsAction="always" />
+</menu>

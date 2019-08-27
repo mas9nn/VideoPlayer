@@ -17,14 +17,14 @@ import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
-public class FollowedAdapter extends RecyclerView.Adapter<FollowedAdapter.ViewHolder> {
+public class CategoryLogosAdapter extends RecyclerView.Adapter<CategoryLogosAdapter.ViewHolder> {
 
     private List<FollowedItems> logos;
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
 
     // data is passed into the constructor
-    public FollowedAdapter(Context context, List<FollowedItems> logos) {
+    public CategoryLogosAdapter(Context context, List<FollowedItems> logos) {
         this.mInflater = LayoutInflater.from(context);
         this.logos = logos;
     }
@@ -35,14 +35,14 @@ public class FollowedAdapter extends RecyclerView.Adapter<FollowedAdapter.ViewHo
     @NonNull
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view;
-        view = mInflater.inflate(R.layout.logo_items, parent, false);
+        view = mInflater.inflate(R.layout.item_category_logos, parent, false);
         return new ViewHolder(view);
     }
 
     // binds the data to the view and textview in each row
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Picasso.get().load(logos.get(position).getLogo()).into(holder.logo);
+        holder.logo.setImageResource(logos.get(position).getResource());
     }
 
     // total number of rows

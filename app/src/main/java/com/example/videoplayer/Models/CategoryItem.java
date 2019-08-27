@@ -1,13 +1,14 @@
 package com.example.videoplayer.Models;
 
 public class CategoryItem {
-    String name,id;
+    String name,id,back_color;
     int image;
 
-    public CategoryItem(String name, String id, int image) {
+    public CategoryItem(String name, String id, int image,String back_color) {
         this.name = name;
         this.id = id;
         this.image = image;
+        this.back_color = back_color;
     }
 
     public String getName() {
@@ -32,5 +33,13 @@ public class CategoryItem {
 
     public void setImage(int image) {
         this.image = image;
+    }
+
+    public String getBack_color() {
+        return back_color;
+    }
+
+    public void setBack_color(String back_color) {
+        this.back_color = back_color;
     }
 }

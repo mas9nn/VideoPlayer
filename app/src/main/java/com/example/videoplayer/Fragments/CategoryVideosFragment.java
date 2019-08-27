@@ -92,12 +92,14 @@ public class CategoryVideosFragment extends Fragment implements ItemSelecListene
                     shimmer.setVisibility(View.GONE);
                 } catch (JSONException e) {
                     e.printStackTrace();
+
                 }
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 error.printStackTrace(); //log the error resulting from the request for diagnosis/debugging
+                getVideos(id);
             }
         }) {
             @Override

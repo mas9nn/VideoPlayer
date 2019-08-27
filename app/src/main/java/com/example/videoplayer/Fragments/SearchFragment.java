@@ -22,6 +22,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.videoplayer.Adapters.ListViewAdapter;
 import com.example.videoplayer.Adapters.PanelAdapter;
+import com.example.videoplayer.Common.Common;
 import com.example.videoplayer.Interfaces.ItemSelecListener;
 import com.example.videoplayer.Activities.MainActivity;
 import com.example.videoplayer.Models.MainPageItems;
@@ -32,8 +33,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -64,6 +67,7 @@ public class SearchFragment extends Fragment implements ItemSelecListener {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                ((MainActivity) getActivity()).hideKeyboard(choices.get(i));
                 getVideos(choices.get(i));
                 listView.setVisibility(View.GONE);
                 recyclerView.setVisibility(View.VISIBLE);
@@ -75,11 +79,14 @@ public class SearchFragment extends Fragment implements ItemSelecListener {
     public void savedChoises() {
         if (pref.getString("set", null) != null) {
             choices.clear();
-            String csvList = pref.getString("set","");
-            String[] items = csvList.split("`,/-");
+            String csvList = pref.getString("set", "");
+            String[] splited = csvList.split("`,/-");
+            LinkedHashSet<String> lhSetColors =
+                    new LinkedHashSet<String>(Arrays.asList(splited));
+            String[] items = lhSetColors.toArray(new String[lhSetColors.size()]);
             Collections.addAll(choices, items);
             Collections.reverse(choices);
-            Log.d("dsadsa",choices+"");
+            Log.d("dsadsa", choices + "");
             listViewAdapter = new ListViewAdapter(getContext(), choices);
             listView.setAdapter(listViewAdapter);
         }
@@ -125,6 +132,7 @@ public class SearchFragment extends Fragment implements ItemSelecListener {
             @Override
             public void onErrorResponse(VolleyError error) {
                 error.printStackTrace(); //log the error resulting from the request for diagnosis/debugging
+                getVideos(query);
             }
         }) {
             @Override
@@ -146,7 +154,7 @@ public class SearchFragment extends Fragment implements ItemSelecListener {
             recyclerView.setVisibility(View.GONE);
         }
         listView.setVisibility(visibility);
-        Log.d("visibility",listView.getVisibility()+" ");
+        Log.d("visibility", listView.getVisibility() + " ");
     }
 
     public void getChoices(String query) {
@@ -201,6 +209,7 @@ public class SearchFragment extends Fragment implements ItemSelecListener {
     public void onItemSelectedListener(View view, int position) {
         try {
             ((MainActivity) getActivity()).changePostion();
+            Common.MainFragment=true;
             ((MainActivity) getActivity()).MaximizePanel(items.get(position).getUrl(), items, position);
         } catch (JSONException e) {
             e.printStackTrace();

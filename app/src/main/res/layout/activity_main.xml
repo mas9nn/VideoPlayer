@@ -29,13 +29,12 @@
             app:mbn_rippleColor="?attr/col"
             app:mbn_selectedIconColor="?attr/tintColor"
             app:mbn_shadowColor="?attr/shadowColor" />
-
     </LinearLayout>
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="45dp"
         android:background="?attr/col"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -51,6 +50,7 @@
                 android:textColor="?attr/textColor"
                 android:textStyle="bold"
                 app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
@@ -113,7 +113,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@id/linear"
-        app:layout_constraintTop_toBottomOf="@id/toolbar"></com.example.videoplayer.ViewPager.CustomViewPager>
+        app:layout_constraintTop_toBottomOf="@id/toolbar"/>
 
     <FrameLayout
         android:id="@+id/searcher"
@@ -414,6 +414,7 @@
                         android:id="@+id/next_video"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:theme="@style/SCBSwitch"
                         draggable_view:layout_constraintBottom_toBottomOf="@id/next"
                         draggable_view:layout_constraintRight_toRightOf="@id/follow"
                         draggable_view:layout_constraintTop_toTopOf="@id/next" />

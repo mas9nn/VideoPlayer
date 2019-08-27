@@ -175,6 +175,7 @@ public class FollowedFragment extends Fragment implements ItemSelecListener, Fol
             @Override
             public void onErrorResponse(VolleyError error) {
                 error.printStackTrace(); //log the error resulting from the request for diagnosis/debugging
+                getVideos(id);
             }
         }) {
             @Override

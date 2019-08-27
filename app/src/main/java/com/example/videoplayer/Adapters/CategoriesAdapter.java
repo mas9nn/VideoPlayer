@@ -1,6 +1,8 @@
 package com.example.videoplayer.Adapters;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,6 +41,7 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.Vi
     public void onBindViewHolder(@NonNull CategoriesAdapter.ViewHolder holder, int position) {
         holder.preview.setImageResource(list.get(position).getImage());
         holder.name.setText(list.get(position).getName());
+        holder.view.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor(list.get(position).getBack_color())));
     }
 
     @Override
@@ -50,6 +53,7 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.Vi
         ImageView preview;
         TextView name;
         ItemSelecListener selecListener;
+        View view;
         public void setSelecListener(ItemSelecListener selecListener) {
             this.selecListener = selecListener;
         }
@@ -58,6 +62,7 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.Vi
             super(itemView);
             preview = itemView.findViewById(R.id.logo);
             name = itemView.findViewById(R.id.category_name);
+            view = itemView.findViewById(R.id.back_of_category);
             itemView.setOnClickListener(this);
             this.selecListener = selecListener;
         }

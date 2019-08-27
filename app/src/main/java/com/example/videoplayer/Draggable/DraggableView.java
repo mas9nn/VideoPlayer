@@ -729,10 +729,6 @@ public class DraggableView extends RelativeLayout {
         return false;
     }
 
-    public void setClickablePx() {
-
-    }
-
     /**
      * @return configured dragged view margin right configured.
      */

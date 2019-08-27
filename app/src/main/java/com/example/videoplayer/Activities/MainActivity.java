@@ -87,11 +87,13 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.SystemClock;
@@ -109,6 +111,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.ViewTreeObserver;
+import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
@@ -195,6 +198,9 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
     SharedPreferences.Editor editor;
     MeowBottomNavigation meowBottomNavigation;
     TextView name_of_vidos, channel_n;
+    NestedScrollView scrollView;
+
+    CountDownTimer timer;
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -239,6 +245,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
         pref = getApplicationContext().getSharedPreferences("MyPref", 0);
         if (pref.getBoolean("dark", false)) {
@@ -257,6 +264,9 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         adapter.addFragment(new LoginFragment(), "LoginFragment");
         viewPager.setAdapter(adapter);
         viewPager.setPagingEnabled(false);
+
+        scrollView =findViewById(R.id.nested_scroll);
+
         handler = new Handler();
 
         editor = pref.edit();
@@ -473,6 +483,10 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                             SearchFragment lastSMSFragment = (SearchFragment) getSupportFragmentManager().findFragmentByTag("categoryVideos");
                             lastSMSFragment.getVideos(textView.getText().toString());
                             lastSMSFragment.setVisible(View.GONE);
+
+                            InputMethodManager imm = (InputMethodManager) getSystemService(
+                                    Context.INPUT_METHOD_SERVICE);
+                            imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
                             return true;
                         }
                         return false;
@@ -697,6 +711,13 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         getSupportActionBar().setDisplayShowHomeEnabled(true);
     }
 
+    public void hideKeyboard(String name) {
+        searchView.setText(name);
+        InputMethodManager imm = (InputMethodManager) getSystemService(
+                Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
+    }
+
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
         // Your code here
@@ -727,6 +748,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         tol.setNavigationIcon(R.drawable.ic_keyboard_back);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
+        search.setVisibility(View.GONE);
     }
 
     public String getId() {
@@ -739,13 +761,84 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             homePressed();
         }
         if (item.getItemId() == R.id.action_filter) {
+            InputMethodManager imm = (InputMethodManager) getSystemService(
+                    Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
             final Dialog dialog = new Dialog(this);
             dialog.setContentView(R.layout.custom_dialog);
             Button cancel = dialog.findViewById(R.id.cancel);
+            TextView choiser = dialog.findViewById(R.id.choiser);
+            TextView duration_txt = dialog.findViewById(R.id.duration_txt);
             cancel.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     dialog.dismiss();
+                }
+            });
+            ConstraintLayout clickable_of_filter = dialog.findViewById(R.id.clickable_of_filter);
+            clickable_of_filter.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    PopupMenu popup = new PopupMenu(MainActivity.this, clickable_of_filter);
+                    //inflating menu from xml resource
+                    popup.inflate(R.menu.filter_menu);
+                    //adding click listener
+                    popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                        @Override
+                        public boolean onMenuItemClick(MenuItem item) {
+                            switch (item.getItemId()) {
+                                case R.id.all_time:
+                                    choiser.setText(item.getTitle());
+                                    return true;
+                                case R.id.weak_ago:
+                                    choiser.setText(item.getTitle());
+                                    return true;
+                                case R.id.month_ago:
+                                    choiser.setText(item.getTitle());
+                                    return true;
+                                case R.id.year_ago:
+                                    choiser.setText(item.getTitle());
+                                    return true;
+                                default:
+                                    return false;
+                            }
+                        }
+                    });
+                    //displaying the popup
+                    popup.show();
+                }
+            });
+            ConstraintLayout clickable_of_filter2 = dialog.findViewById(R.id.clickable_of_filter2);
+            clickable_of_filter2.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    PopupMenu popup = new PopupMenu(MainActivity.this, clickable_of_filter2);
+                    //inflating menu from xml resource
+                    popup.inflate(R.menu.filter_duration_menu);
+                    //adding click listener
+                    popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                        @Override
+                        public boolean onMenuItemClick(MenuItem item) {
+                            switch (item.getItemId()) {
+                                case R.id.all:
+                                    duration_txt.setText(item.getTitle());
+                                    return true;
+                                case R.id.short_video:
+                                    duration_txt.setText(item.getTitle());
+                                    return true;
+                                case R.id.srednie:
+                                    duration_txt.setText(item.getTitle());
+                                    return true;
+                                case R.id.dlinnye:
+                                    duration_txt.setText(item.getTitle());
+                                    return true;
+                                default:
+                                    return false;
+                            }
+                        }
+                    });
+                    //displaying the popup
+                    popup.show();
                 }
             });
             dialog.show();
@@ -780,6 +873,11 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             ids.clear();
         }
 
+        if (timer!=null){
+            timer.cancel();
+            after_video_end.setVisibility(View.GONE);
+        }
+        scrollView.scrollTo(0,0);
         margin = 1;
         id = items.get(position).getId();
         ids.add(id);
@@ -819,7 +917,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                 dataSourceFactory, extractorsFactory, null, null);
         forAutoPlay.add(suggestion);
         ids.add(suggestions.get(0).getId());
-        Log.d("positions",forAutoPlay.size()+" "+ids.size());
+        Log.d("positions", forAutoPlay.size() + " " + ids.size());
     }
 
     @Override
@@ -946,6 +1044,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                     c = 0;
                     margin = 1;
                     player.prepare(forAutoPlay.get(forAutoPlay.size() - 1));
+                    scrollView.scrollTo(0,0);
                 }
             }
         });
@@ -953,7 +1052,9 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         previous.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (forAutoPlay.size() != 1 && suggestions.size() != 0) {
+                Log.wtf("miracle",forAutoPlay.size()+"");
+
+                if (forAutoPlay.size() > 2 && suggestions.size() >=1) {
                     c = 0;
                     margin = 2;
                     forAutoPlay.remove(forAutoPlay.size() - 1);
@@ -961,10 +1062,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                     player.prepare(forAutoPlay.get(forAutoPlay.size() - 2));
                     forAutoPlay.remove(forAutoPlay.size() - 1);
                     ids.remove(ids.size() - 1);
-                } else {
-                    c = 0;
-                    margin = 2;
-                    player.prepare(forAutoPlay.get(forAutoPlay.size() - 2));
+                    scrollView.scrollTo(0,0);
                 }
             }
         });
@@ -1119,7 +1217,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                             right_last[0] = (int) Math.max(motionEvent.getX(motionEvent.getPointerId(0)), motionEvent.getX(motionEvent.getPointerId(1)));
                             Log.d("multitouch", left_last[0] + " " + right_last[0]);
                             int orientation = getResources().getConfiguration().orientation;
-                            if (left_last[0] > left[0]+250 && right_last[0]+250 < right[0] && orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                            if (left_last[0] > left[0] + 250 && right_last[0] + 250 < right[0] && orientation == Configuration.ORIENTATION_LANDSCAPE) {
                                 setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
                             }
                         }
@@ -1351,6 +1449,11 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             @Override
             public void onErrorResponse(VolleyError error) {
                 error.printStackTrace(); //log the error resulting from the request for diagnosis/debugging
+                try {
+                    requstByVideo(id);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         }) {
             @Override
@@ -1472,7 +1575,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             Button otmena = findViewById(R.id.otmena);
             Button igrat = findViewById(R.id.igrat);
 
-            CountDownTimer timer = new CountDownTimer(10000, 1000) {
+            timer = new CountDownTimer(10000, 1000) {
 
                 public void onTick(long millisUntilFinished) {
                     ready_text.setText("" + millisUntilFinished / 1000);
@@ -1484,7 +1587,6 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                     player.setPlayWhenReady(true);
                 }
             }.start();
-
             close.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -1492,7 +1594,6 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                     after_video_end.setVisibility(View.GONE);
                 }
             });
-
             otmena.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -1512,7 +1613,6 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             });
         }
     }
-
     int c = 0;
 
     @Override
@@ -1522,6 +1622,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
 
             c++;
             try {
+                Log.wtf("miracle",ids.size()+"");
                 requstByVideo(ids.get(ids.size() - margin));
                 player.setPlayWhenReady(true);
             } catch (JSONException e) {
@@ -1532,7 +1633,8 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
 
     @Override
     public void onPlayerError(ExoPlaybackException error) {
-
+        c=-1;
+        Toast.makeText(this, error.getMessage(), Toast.LENGTH_SHORT).show();
     }
 
 }

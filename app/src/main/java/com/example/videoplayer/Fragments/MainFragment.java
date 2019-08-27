@@ -41,9 +41,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
-
-
 public class MainFragment extends Fragment implements ItemSelecListener, SwipeRefreshLayout.OnRefreshListener {
     RecyclerView recyclerView;
     ArrayList<MainPageItems> items = new ArrayList<>();
@@ -52,8 +49,6 @@ public class MainFragment extends Fragment implements ItemSelecListener, SwipeRe
     ShimmerFrameLayout shimmer;
     SwipeRefreshLayout mSwipeRefreshLayout;
     int count = 0;
-    ConstraintLayout containerr;
-
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         if (savedInstanceState != null) {
@@ -190,6 +185,11 @@ public class MainFragment extends Fragment implements ItemSelecListener, SwipeRe
                 mSwipeRefreshLayout.setRefreshing(false);
                 shimmer.setVisibility(View.VISIBLE);
                 recyclerView.setVisibility(View.GONE);
+                try {
+                    sendWorkPostRequest();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         }) {
             @Override

@@ -4,17 +4,20 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="8dp"
+    android:background="?attr/col"
     android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="80dp"
+        android:background="?attr/col"
         app:layout_constraintTop_toTopOf="parent"
         android:weightSum="3">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="0dp"
             android:layout_height="80dp"
+            android:background="?attr/col"
             android:layout_weight="1.3">
 
             <ImageView
@@ -39,6 +42,7 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="0dp"
+            android:background="?attr/col"
             android:paddingLeft="10dp"
             android:layout_height="80dp"
             android:layout_weight="1.7">
@@ -89,7 +93,7 @@
                 android:textColor="@color/gray"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="5dp"
-                android:text="18 chasov nazad"
+                android:text=""
                 app:layout_constraintRight_toLeftOf="@id/vert"
                 app:layout_constraintLeft_toRightOf="@id/view"
                 app:layout_constraintTop_toTopOf="@id/viewers" />
@@ -111,7 +115,7 @@
                 android:background="@drawable/gray_back"
                 android:layout_height="0dp"
                 android:textColor="@color/gray"
-                android:text="SHORT NEWS"
+                android:text=""
                 app:layout_constraintRight_toLeftOf="@id/vert"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintBottom_toTopOf="@id/channel_name"

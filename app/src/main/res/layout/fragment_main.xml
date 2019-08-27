@@ -4,7 +4,7 @@
     android:id="@+id/main_fr"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white">
+    android:background="?attr/col">
 
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -16,7 +16,7 @@
             android:id="@+id/recycler"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@android:color/white"></androidx.recyclerview.widget.RecyclerView>
+            android:background="?attr/col"></androidx.recyclerview.widget.RecyclerView>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <com.facebook.shimmer.ShimmerFrameLayout
@@ -26,10 +26,11 @@
         android:visibility="gone"
         app:shimmer_duration="800"
         app:shimmer_repeat_delay="1"
-        android:background="@android:color/white">
+        android:background="?attr/col">
 
         <LinearLayout
             android:layout_width="match_parent"
+            android:background="?attr/col"
             android:layout_height="match_parent"
             android:orientation="vertical">
 
