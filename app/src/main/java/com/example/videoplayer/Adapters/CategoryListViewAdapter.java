@@ -44,7 +44,6 @@ public class CategoryListViewAdapter extends RecyclerView.Adapter<CategoryListVi
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         holder.preview.setImageResource(logos.get(position).getResource());
         holder.name.setText(logos.get(position).getName());
-        Log.wtf("adapter",logos.get(position).getName());
     }
 
     // total number of rows

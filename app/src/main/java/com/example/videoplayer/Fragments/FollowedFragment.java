@@ -68,7 +68,6 @@ public class FollowedFragment extends Fragment implements ItemSelecListener, Fol
 
     @Override
     public void onItemSelectedListener(View view, int position) {
-        Log.d("asd", R.id.videos + "");
         try {
             ((MainActivity) getActivity()).MaximizePanel(items.get(position).getUrl(), items, position);
         } catch (JSONException e) {
@@ -96,7 +95,6 @@ public class FollowedFragment extends Fragment implements ItemSelecListener, Fol
                         String id = channels.getString("id");
                         String logo = channels.getString("avatar");
                         String title = channels.getString("first_name");
-                        Log.d("prikol", id + " " + logo);
                         list_logos.add(new FollowedItems(logo, id,title));
                         getVideos(id);
                     }
@@ -109,7 +107,6 @@ public class FollowedFragment extends Fragment implements ItemSelecListener, Fol
                             ((MainActivity) getActivity()).openChannel(list_logos.get(position).getTitle(),list_logos.get(position).getId());
                         }
                     });
-                    Log.d("dataFollowed", data + "");
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -140,13 +137,11 @@ public class FollowedFragment extends Fragment implements ItemSelecListener, Fol
         StringRequest stringRequest = new StringRequest(Request.Method.POST, requestUrl, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                Log.e("Respose", "" + response); //the response contains the result from the server, a json string or any other object returned by your server
                 try {
                     JSONObject j = new JSONObject(response);
                     JSONArray data = j.getJSONArray("data");
                     for (int i = 0; i < data.length(); i++) {
                         try {
-                            Log.d("Response", data.get(i) + "");
                             JSONObject object = data.getJSONObject(i);
                             JSONObject owner = object.getJSONObject("owner");
                             MainPageItems pageItems = new MainPageItems();

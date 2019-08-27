@@ -84,7 +84,6 @@ public class CategoryFragment extends Fragment implements ItemSelecListener {
         channel_logos.add(new FollowedItems(R.drawable.ic_star));
         channel_logos.add(new FollowedItems(R.drawable.ic_star));
         channel_logos.add(new FollowedItems(R.drawable.ic_star));
-       // Log.wtf("adapterfoll",channel_logos.get(0).getResource()+"");
         channel_adapter = new CategoryLogosAdapter(getContext(),channel_logos);
         channels.setAdapter(channel_adapter);
     }

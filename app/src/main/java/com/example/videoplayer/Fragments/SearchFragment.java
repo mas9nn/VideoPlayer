@@ -86,7 +86,6 @@ public class SearchFragment extends Fragment implements ItemSelecListener {
             String[] items = lhSetColors.toArray(new String[lhSetColors.size()]);
             Collections.addAll(choices, items);
             Collections.reverse(choices);
-            Log.d("dsadsa", choices + "");
             listViewAdapter = new ListViewAdapter(getContext(), choices);
             listView.setAdapter(listViewAdapter);
         }
@@ -103,7 +102,6 @@ public class SearchFragment extends Fragment implements ItemSelecListener {
                     JSONArray data = j.getJSONArray("data");
                     for (int i = 0; i < data.length(); i++) {
                         try {
-                            Log.d("Response", data.get(i) + "");
                             JSONObject object = data.getJSONObject(i);
                             JSONObject owner = object.getJSONObject("owner");
                             MainPageItems pageItems = new MainPageItems();
@@ -154,7 +152,6 @@ public class SearchFragment extends Fragment implements ItemSelecListener {
             recyclerView.setVisibility(View.GONE);
         }
         listView.setVisibility(visibility);
-        Log.d("visibility", listView.getVisibility() + " ");
     }
 
     public void getChoices(String query) {
@@ -171,7 +168,6 @@ public class SearchFragment extends Fragment implements ItemSelecListener {
                 try {
                     JSONObject j = new JSONObject(response);
                     JSONArray data = j.getJSONArray("data");
-                    Log.d("Response", data.length() + "");
                     choices.clear();
                     for (int i = 0; i < data.length(); i++) {
                         try {

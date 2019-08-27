@@ -66,7 +66,6 @@ public class LoginActivity extends AppCompatActivity {
         StringRequest stringRequest = new StringRequest(Request.Method.POST, requestUrl, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                Log.e("Respose", "" + response); //the response contains the result from the server, a json string or any other object returned by your server
                 try {
                     JSONObject j = new JSONObject(response);
                     JSONObject data = j.getJSONObject("data");

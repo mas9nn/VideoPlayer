@@ -94,8 +94,6 @@ public class MainFragment extends Fragment implements ItemSelecListener, SwipeRe
 
             }
         });
-
-        Log.d("asdasd", "save");
         if (savedInstanceState != null) {
             //Restore the fragment's state here
 
@@ -127,30 +125,25 @@ public class MainFragment extends Fragment implements ItemSelecListener, SwipeRe
 
     @Override
     public void onResume() {
-        Log.d("asdasd", "assda");
         super.onResume();
     }
 
     @Override
     public void onPause() {
-        Log.d("asdasd", "pau");
         super.onPause();
     }
 
     private void sendWorkPostRequest() throws JSONException {
         String requestUrl = "https://video.orzu.org/api/v1.0/?type=get_videos&limit=5" + count;
-        Log.d("Response", requestUrl);
         StringRequest stringRequest = new StringRequest(Request.Method.POST, requestUrl, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                Log.e("Respose", "" + response); //the response contains the result from the server, a json string or any other object returned by your server
                 try {
                     JSONObject j = new JSONObject(response);
                     JSONObject data = j.getJSONObject("data");
                     JSONArray featured = data.getJSONArray("featured");
                     for (int i = 0; i < featured.length(); i++) {
                         try {
-                            Log.d("Response", featured.get(i) + "");
                             JSONObject object = featured.getJSONObject(i);
                             JSONObject owner = object.getJSONObject("owner");
                             MainPageItems pageItems = new MainPageItems();

@@ -310,7 +310,6 @@ public class DraggablePanel extends FrameLayout {
     }
 
     public void changetTopHeight(int height) {
-        Log.d("height",height+"");
         draggableView.setTopViewHeight(height);
     }
 

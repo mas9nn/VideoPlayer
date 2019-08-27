@@ -58,7 +58,6 @@ public class CategoryVideosFragment extends Fragment implements ItemSelecListene
 
     public void getVideos(String id) {
         items.clear();
-
         String requestUrl = "https://video.orzu.org/api/v1.0/?type=get_videos_by_category&category_id=" + id;
         StringRequest stringRequest = new StringRequest(Request.Method.POST, requestUrl, new Response.Listener<String>() {
             @Override
@@ -68,7 +67,6 @@ public class CategoryVideosFragment extends Fragment implements ItemSelecListene
                     JSONArray data = j.getJSONArray("data");
                     for (int i = 0; i < data.length(); i++) {
                         try {
-                            Log.d("Response", data.get(i) + "");
                             JSONObject object = data.getJSONObject(i);
                             JSONObject owner = object.getJSONObject("owner");
                             MainPageItems pageItems = new MainPageItems();

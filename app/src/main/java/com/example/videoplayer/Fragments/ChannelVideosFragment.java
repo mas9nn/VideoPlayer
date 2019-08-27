@@ -93,8 +93,6 @@ public class ChannelVideosFragment extends Fragment implements ItemSelecListener
 
             }
         });
-
-        Log.d("asdasd", "save");
         if (savedInstanceState != null) {
             //Restore the fragment's state here
 
@@ -125,30 +123,25 @@ public class ChannelVideosFragment extends Fragment implements ItemSelecListener
 
     @Override
     public void onResume() {
-        Log.d("asdasd", "assda");
         super.onResume();
     }
 
     @Override
     public void onPause() {
-        Log.d("asdasd", "pau");
         super.onPause();
     }
 
     private void sendWorkPostRequest() throws JSONException {
         items.clear();
         String requestUrl = "https://video.orzu.org/api/v1.0/?type=get_videos_by_channel&limit=30&channel_id=" + Common.channelId;
-        Log.d("Response", requestUrl);
         StringRequest stringRequest = new StringRequest(Request.Method.POST, requestUrl, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                Log.e("Respose", "" + response); //the response contains the result from the server, a json string or any other object returned by your server
                 try {
                     JSONObject j = new JSONObject(response);
                     JSONArray data = j.getJSONArray("data");
                     for (int i = 0; i < data.length(); i++) {
                         try {
-                            Log.d("Response", data.get(i) + "");
                             JSONObject object = data.getJSONObject(i);
                             JSONObject owner = object.getJSONObject("owner");
                             MainPageItems pageItems = new MainPageItems();

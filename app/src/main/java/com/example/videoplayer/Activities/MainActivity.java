@@ -219,22 +219,18 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
 
     @Override
     public void onBackPressed() {
-        Log.d("asd", searcher.getVisibility() + " " + panel.isClosedAtRight());
         int orientation = getResources().getConfiguration().orientation;
         if (panel.isMaximized()) {
-            Log.d("asd", "max");
             if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
                 setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
             } else {
                 panel.minimize();
             }
             if (searcher.getVisibility() == View.VISIBLE) {
-                Log.d("asd", "mbin");
                 homePressed();
             }
         } else if (searcher.getVisibility() == View.VISIBLE) {
             homePressed();
-            Log.d("asd", "min");
         } else if (panel.isMinimized()) {
             panel.closeToLeft();
 
@@ -281,24 +277,19 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             @Override
             public Unit invoke(MeowBottomNavigation.Model model) {
                 if (model.getId() == 1) {
-                    Log.d("position", model.getId() + "");
                     viewPager.setCurrentItem(0);
 
                 } else if (model.getId() == 2) {
-                    Log.d("position", model.getId() + "");
                     viewPager.setCurrentItem(1);
-                    Log.d("minim", panel.isMinimized() + "");
                     if (!pref.getBoolean("isLoged", false)) {
                         viewPager.getAdapter().notifyDataSetChanged();
                     }
                 } else if (model.getId() == 3) {
-                    Log.d("position", model.getId() + "");
                     viewPager.setCurrentItem(2);
                     if (!pref.getBoolean("isLoged", false)) {
                         viewPager.getAdapter().notifyDataSetChanged();
                     }
                 } else if (model.getId() == 4) {
-                    Log.d("position", model.getId() + "");
                     viewPager.setCurrentItem(3);
                     if (!pref.getBoolean("isLoged", false)) {
                         viewPager.getAdapter().notifyDataSetChanged();
@@ -477,9 +468,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                                 }
                                 editor.putString("set", csv.toString());
                                 editor.commit();
-                                Log.d("asd", csv + "else");
                             }
-                            Log.d("asd", pref.getString("set", null) + "");
                             SearchFragment lastSMSFragment = (SearchFragment) getSupportFragmentManager().findFragmentByTag("categoryVideos");
                             lastSMSFragment.getVideos(textView.getText().toString());
                             lastSMSFragment.setVisible(View.GONE);
@@ -576,7 +565,6 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         int width = sizee.x;
         topView = width * 0.55;
         panel.setTopViewHeight((int) topView);
-        Log.d("sad1", "" + topView);
         panel.closeToLeft();
         panel.setVisibility(View.GONE);
         layout.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -590,7 +578,6 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                         r.getDisplayMetrics()
                 );
                 layout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                Log.d("sad", layout.getHeight() + "");
                 panel.setTopViewMarginBottom((int) (layout.getHeight() + px + panel.getTopViewMarginRight()));
             }
         });
@@ -600,7 +587,6 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             public void onMaximized() {
                 panel.setClickToMaximizeEnabled(false);
                 panel.setClickToMinimizeEnabled(false);
-                Log.d("maxim", panel.getTopView() + "");
                 exoPlayerView.performClick();
             }
 
@@ -611,7 +597,6 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                     // handler.removeCallbacks();
                     panel.setClickToMaximizeEnabled(true);
                     panel.setTopViewHeight((int) topView);
-                    Log.d("asdd", panel.getTopView() + "");
                 }
             }
 
@@ -632,11 +617,9 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
 
         Intent intent = getIntent();
         data_uri = intent.getData();
-        Log.d("data", data_uri + "");
         if (data_uri != null) {
             String string = data_uri + "";
             String[] parts = string.split("/");
-            Log.d("data", parts[parts.length - 1] + "");
             Common.MainFragment = false;
             forAutoPlay.clear();
             ids.clear();
@@ -662,7 +645,6 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
     private void showWithRevealEffect(View view) {
         cx = X;
         cy = Y;
-        Log.d("Asdas", "log");
         // get the final radius for the clipping circle
         float finalRadius = (float) Math.hypot(view.getWidth(), view.getHeight());
 
@@ -890,7 +872,6 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         panel.setVisibility(View.VISIBLE);
         waterUrl = url;
 
-        Log.d("positions", lastPosition + " " + position + " " + player);
         if (lastPosition != position) {
             releasePlayer();
             initPlayer();
@@ -898,7 +879,6 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         } else {
             panel.maximize();
         }
-        Log.d("url", url);
         lastPosition = position;
     }
 
@@ -917,7 +897,6 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                 dataSourceFactory, extractorsFactory, null, null);
         forAutoPlay.add(suggestion);
         ids.add(suggestions.get(0).getId());
-        Log.d("positions", forAutoPlay.size() + " " + ids.size());
     }
 
     @Override
@@ -966,7 +945,6 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             player.seekTo(position);
             player.setPlayWhenReady(false);
         } else {
-            Log.wtf("sudapriwel", "da" + waterUrl);
             player.setPlayWhenReady(true);
         }
         ImageButton button = exoPlayerView.findViewById(R.id.fullscreen);
@@ -1007,7 +985,6 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         timeBar.addListener(new TimeBar.OnScrubListener() {
             @Override
             public void onScrubStart(TimeBar timeBar, long position) {
-                Log.d("dddd", "OnStart");
                 panel.cancelHelper();
                 player.seekTo(position);
                 panel.setClickToMaximizeEnabled(false);
@@ -1020,7 +997,6 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                 player.setPlayWhenReady(true);
                 panel.disable(false);
                 panel.setClickToMaximizeEnabled(false);
-                Log.d("dddd", "onmove");
             }
 
             @Override
@@ -1032,7 +1008,6 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                 }
                 player.setPlayWhenReady(true);
                 panel.setClickToMaximizeEnabled(true);
-                Log.d("dddd", "onStop");
             }
         });
 
@@ -1052,7 +1027,6 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         previous.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.wtf("miracle",forAutoPlay.size()+"");
 
                 if (forAutoPlay.size() > 2 && suggestions.size() >=1) {
                     c = 0;
@@ -1099,7 +1073,6 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             @Override
             public void run() {
 
-                Log.d("clicks", clicks + " " + (SystemClock.elapsedRealtime() - last_click[0]));
                 if (clicks == 1) {
                     if (exoPlayerView.isControllerVisible()) {
                         exoPlayerView.hideController();
@@ -1135,20 +1108,16 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 switch (motionEvent.getAction()) {
                     case MotionEvent.ACTION_DOWN:
-                        Log.d("multitouch", "down" + motionEvent.getPointerCount());
                         if (motionEvent.getPointerCount() == 2) {
                             left[0] = (int) Math.min(motionEvent.getX(motionEvent.getPointerId(0)), motionEvent.getX(motionEvent.getPointerId(1)));
                             right[0] = (int) Math.max(motionEvent.getX(motionEvent.getPointerId(0)), motionEvent.getX(motionEvent.getPointerId(1)));
-                            Log.d("multitouch", left[0] + " " + right[0]);
                         }
                         return true;
                     case MotionEvent.ACTION_UP:
                         touch_count[0] = 0;
-                        Log.d("multitouch", "up" + motionEvent.getPointerCount());
 
                         exoPlayerView.enableController();
                         if (motionEvent.getX() > exoPlayerView.getWidth() / 2) {
-                            Log.d("minim", panel.isMinimized() + "");
                             if (bck[0]) {
                                 clicks = 0;
                             }
@@ -1161,7 +1130,6 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                                 last_click[0] = SystemClock.elapsedRealtime();
                             }
                             if (clicks >= 2 & SystemClock.elapsedRealtime() - last_click[0] < 350) {
-                                Log.d("asdasdd", SystemClock.elapsedRealtime() - last_click[0] + "");
                                 last_click[0] = SystemClock.elapsedRealtime();
                             }
                             if (clicks >= 2) {
@@ -1188,7 +1156,6 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                             }
 
                             if (clicks >= 2 & SystemClock.elapsedRealtime() - last_click[0] < 350) {
-                                Log.d("asdasdd", SystemClock.elapsedRealtime() - last_click[0] + "");
                                 last_click[0] = SystemClock.elapsedRealtime();
                             }
 
@@ -1204,18 +1171,14 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                         }
                         return true;
                     case MotionEvent.ACTION_MOVE:
-                        Log.d("move", "moving");
-                        Log.d("multitouch", "down" + motionEvent.getPointerCount());
                         if (motionEvent.getPointerCount() == 2 && touch_count[0] == 0) {
                             touch_count[0]++;
                             left[0] = (int) Math.min(motionEvent.getX(motionEvent.getPointerId(0)), motionEvent.getX(motionEvent.getPointerId(1)));
                             right[0] = (int) Math.max(motionEvent.getX(motionEvent.getPointerId(0)), motionEvent.getX(motionEvent.getPointerId(1)));
-                            Log.d("multitouch", left[0] + " " + right[0]);
                         }
                         if (motionEvent.getPointerCount() == 2) {
                             left_last[0] = (int) Math.min(motionEvent.getX(motionEvent.getPointerId(0)), motionEvent.getX(motionEvent.getPointerId(1)));
                             right_last[0] = (int) Math.max(motionEvent.getX(motionEvent.getPointerId(0)), motionEvent.getX(motionEvent.getPointerId(1)));
-                            Log.d("multitouch", left_last[0] + " " + right_last[0]);
                             int orientation = getResources().getConfiguration().orientation;
                             if (left_last[0] > left[0] + 250 && right_last[0] + 250 < right[0] && orientation == Configuration.ORIENTATION_LANDSCAPE) {
                                 setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
@@ -1258,7 +1221,6 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             display.getSize(size);
             int height = size.y;
             panel.setTopViewHeight(height);
-            Log.d("sad", "" + height);
             panel.setEnabled(false);
 
             name_of_video.setVisibility(View.VISIBLE);
@@ -1277,7 +1239,6 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             params.height = (int) topView;
             exoPlayerView.setLayoutParams(params);
             panel.setTopViewHeight((int) topView);
-            Log.d("sad", "" + (int) topView);
             panel.setEnabled(true);
             name_of_video.setVisibility(View.GONE);
             channel_names.setVisibility(View.GONE);
@@ -1307,7 +1268,6 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         logedIn = pref.getBoolean("isLoged", false);
         Log.d("isLoged", pref.getString("session", null) + "");
         if (player != null & !panel.isClosed()) {
-            Log.d("asdas", panel.isClosed() + "");
             initPlayer();
         }
     }
@@ -1316,7 +1276,6 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
     protected void onPause() {
         super.onPause();
         if (player != null) {
-            Log.d("pause", "sad");
             position = (int) player.getCurrentPosition();
             onPauseCalled = true;
             player.release();
@@ -1349,11 +1308,9 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
     private void requstByVideo(String id) throws JSONException {
 
         String requestUrl = "https://video.orzu.org/api/v1.0/?type=get_video_details&video_id=" + id;
-        Log.d("ids", id);
         StringRequest stringRequest = new StringRequest(Request.Method.POST, requestUrl, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                Log.e("Respose", "" + response); //the response contains the result from the server, a json string or any other object returned by your server
                 try {
                     JSONObject j = new JSONObject(response);
                     JSONObject data = j.getJSONObject("data");
@@ -1402,13 +1359,11 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                     shimmer.setVisibility(View.GONE);
                     layoutBottomSheet.setVisibility(View.VISIBLE);
                     JSONArray suggested = data.getJSONArray("suggested_videos");
-                    Log.d("suggested", suggested + "");
                     if (suggested.length() != 0) {
                         suggestions.clear();
                     }
                     for (int i = 0; i < suggested.length(); i++) {
                         try {
-                            Log.d("Response", suggested.get(i) + "");
                             JSONObject object = suggested.getJSONObject(i);
                             JSONObject suggested_owner = object.getJSONObject("owner");
                             MainPageItems pageItems = new MainPageItems();
@@ -1428,13 +1383,11 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                         }
                     }
                     if (suggestions.size() != 0) {
-                        Log.d("syges", suggestions.get(0).getName());
                         addSuggestion(suggestions.get(0).getUrl());
                     }
                     if (data_uri != null) {
                         data_uri = null;
                         waterUrl = url_of_data;
-                        Log.d("positions", lastPosition + " " + position + " " + player);
                         releasePlayer();
                         initPlayer();
                         panel.maximize();
@@ -1482,7 +1435,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         StringRequest stringRequest = new StringRequest(Request.Method.POST, requestUrl, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                Log.e("Respose", "" + response);
+
             }
         }, new Response.ErrorListener() {
             @Override
@@ -1512,7 +1465,6 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         StringRequest stringRequest = new StringRequest(Request.Method.POST, requestUrl, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                Log.e("Respose", "" + response); //the response contains the result from the server, a json string or any other object returned by your server
             }
         }, new Response.ErrorListener() {
             @Override
@@ -1547,7 +1499,6 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
     public void onItemSelectedListener(View view, int position) {
         try {
             lastPosition = -123;
-            Log.d("items", suggestions.get(position).getId() + "");
             ids.remove(ids.size() - 1);
             forAutoPlay.remove(forAutoPlay.size() - 1);
             player.setPlayWhenReady(true);
@@ -1560,9 +1511,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
 
     @Override
     public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-        Log.wtf("playbackState", playbackState + "");
         if (playbackState == player.STATE_ENDED && autoplay && suggestions.size() != 0) {
-            Log.wtf("suggestion", suggestions.get(0).getPreview_image() + " " + suggestions.get(0).getName());
             c = 0;
             margin = 1;
             after_video_end.setVisibility(View.VISIBLE);
@@ -1617,12 +1566,10 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
 
     @Override
     public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
-        Log.d("playerstate", player.getPlaybackState() + " " + forAutoPlay.size() + " " + ids.size());
         if (player.getPlaybackState() == player.STATE_BUFFERING && c == 0) {
 
             c++;
             try {
-                Log.wtf("miracle",ids.size()+"");
                 requstByVideo(ids.get(ids.size() - margin));
                 player.setPlayWhenReady(true);
             } catch (JSONException e) {

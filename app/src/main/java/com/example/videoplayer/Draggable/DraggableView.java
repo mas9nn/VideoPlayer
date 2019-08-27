@@ -638,7 +638,6 @@ public class DraggableView extends RelativeLayout {
                     && screenY >= viewLocation[1]
                     && screenY < viewLocation[1] + (view.getHeight() - transformer.getMarginBottom());
         } else {
-            Log.d("enabled", (screenY < viewLocation[1] + (view.getHeight() - 100)) + "");
             return screenX >= viewLocation[0]
                     && screenX < viewLocation[0] + view.getWidth()
                     && screenY >= viewLocation[1]
