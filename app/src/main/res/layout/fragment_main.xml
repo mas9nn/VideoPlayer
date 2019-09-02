@@ -4,7 +4,7 @@
     android:id="@+id/main_fr"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/col">
+    android:background="?attr/back">
 
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -12,26 +12,37 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="?attr/col"></androidx.recyclerview.widget.RecyclerView>
+            android:layout_height="match_parent">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:background="?attr/back"
+                android:clipToPadding="false"
+                android:paddingBottom="60dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toTopOf="parent"></androidx.recyclerview.widget.RecyclerView>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <com.facebook.shimmer.ShimmerFrameLayout
         android:id="@+id/shimmer_view_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="?attr/col"
         android:visibility="gone"
         app:shimmer_duration="800"
-        app:shimmer_repeat_delay="1"
-        android:background="?attr/col">
+        app:shimmer_repeat_delay="1">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:background="?attr/col"
             android:layout_height="match_parent"
+            android:background="?attr/col"
             android:orientation="vertical">
 
             <include layout="@layout/shimmer_items" />

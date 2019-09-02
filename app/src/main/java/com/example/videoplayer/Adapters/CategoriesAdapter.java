@@ -20,9 +20,9 @@ import java.util.List;
 
 public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.ViewHolder> {
 
-    List<CategoryItem> list;
-    Context context;
-    ItemSelecListener select;
+    private List<CategoryItem> list;
+    private Context context;
+    private ItemSelecListener select;
 
     public CategoriesAdapter(List<CategoryItem> list, Context context,ItemSelecListener select) {
         this.list = list;
@@ -53,12 +53,12 @@ public class CategoriesAdapter extends RecyclerView.Adapter<CategoriesAdapter.Vi
         ImageView preview;
         TextView name;
         ItemSelecListener selecListener;
-        View view;
+        ImageView view;
         public void setSelecListener(ItemSelecListener selecListener) {
             this.selecListener = selecListener;
         }
 
-        public ViewHolder(@NonNull View itemView,ItemSelecListener selecListener) {
+        ViewHolder(@NonNull View itemView, ItemSelecListener selecListener) {
             super(itemView);
             preview = itemView.findViewById(R.id.logo);
             name = itemView.findViewById(R.id.category_name);

@@ -3,9 +3,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?attr/back"
-    android:paddingRight="10dp"
+    android:orientation="vertical"
     android:paddingLeft="10dp"
-    android:orientation="vertical">
+    android:paddingRight="10dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/list"
@@ -15,17 +15,18 @@
 
         <ListView
             android:id="@+id/listview"
-            android:background="?attr/back"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"></ListView>
+            android:layout_height="match_parent"
+            android:background="?attr/back"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/videos_in_search"
         android:layout_width="match_parent"
-        android:background="?attr/back"
         android:layout_height="match_parent"
-        android:visibility="gone"></androidx.recyclerview.widget.RecyclerView>
+        android:background="?attr/back"
+        android:overScrollMode="never"
+        android:visibility="gone"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

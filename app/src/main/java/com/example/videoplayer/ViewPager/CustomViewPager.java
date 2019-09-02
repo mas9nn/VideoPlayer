@@ -1,11 +1,14 @@
 package com.example.videoplayer.ViewPager;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 
 import androidx.viewpager.widget.ViewPager;
+
+import org.jetbrains.annotations.NotNull;
 
 public class CustomViewPager extends ViewPager {
     private boolean isPagingEnabled;
@@ -20,6 +23,7 @@ public class CustomViewPager extends ViewPager {
         this.isPagingEnabled = true;
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         return this.isPagingEnabled && super.onTouchEvent(event);
@@ -27,7 +31,7 @@ public class CustomViewPager extends ViewPager {
 
     //for samsung phones to prevent tab switching keys to show on keyboard
     @Override
-    public boolean executeKeyEvent(KeyEvent event) {
+    public boolean executeKeyEvent(@NotNull KeyEvent event) {
         return isPagingEnabled && super.executeKeyEvent(event);
     }
 

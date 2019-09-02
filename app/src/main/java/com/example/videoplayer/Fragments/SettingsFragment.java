@@ -1,5 +1,6 @@
 package com.example.videoplayer.Fragments;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
@@ -7,7 +8,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -19,17 +19,22 @@ import androidx.fragment.app.Fragment;
 
 import com.example.videoplayer.R;
 
-public class SettingsFragment extends Fragment {
-    SharedPreferences pref;
-    SharedPreferences.Editor editor;
-    TextView forward, backward, seconds_forward, seconds_backward, clear_history;
-    int back, frw;
+import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
+public class SettingsFragment extends Fragment {
+    private SharedPreferences pref;
+    private SharedPreferences.Editor editor;
+    private TextView forward, backward, seconds_forward, seconds_backward, clear_history;
+    private int back, frw;
+
+    @SuppressLint("SetTextI18n")
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NotNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_settings, null);
-        pref = getActivity().getApplicationContext().getSharedPreferences("MyPref", 0);
+        pref = Objects.requireNonNull(getActivity()).getApplicationContext().getSharedPreferences("MyPref", 0);
         editor = pref.edit();
         forward = v.findViewById(R.id.forward_peremotka);
         backward = v.findViewById(R.id.backforw_peremotka);

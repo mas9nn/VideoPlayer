@@ -3,6 +3,7 @@ package com.example.videoplayer.Activities;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 
 import android.content.ActivityNotFoundException;
@@ -72,7 +73,6 @@ import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 import com.google.android.exoplayer2.ui.DefaultTimeBar;
 import com.google.android.exoplayer2.ui.PlayerControlView;
 import com.google.android.exoplayer2.ui.TimeBar;
-import com.google.android.exoplayer2.upstream.BandwidthMeter;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
@@ -110,9 +110,11 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewAnimationUtils;
+import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -134,10 +136,12 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 import kotlin.Unit;
 import kotlin.jvm.functions.Function1;
@@ -205,14 +209,11 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode) {
-            case REQ_CODE: {
-                if (resultCode == RESULT_OK && null != data) {
-                    ArrayList result = data
-                            .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-                    searchView.setText(result.get(0).toString());
-                }
-                break;
+        if (requestCode == REQ_CODE) {
+            if (resultCode == RESULT_OK && null != data) {
+                ArrayList result = data
+                        .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                searchView.setText(Objects.requireNonNull(result).get(0).toString());
             }
         }
     }
@@ -223,10 +224,9 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         if (panel.isMaximized()) {
             if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
                 setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
-            } else {
+            } else if (orientation==Configuration.ORIENTATION_PORTRAIT){
                 panel.minimize();
-            }
-            if (searcher.getVisibility() == View.VISIBLE) {
+            }else if (searcher.getVisibility() == View.VISIBLE){
                 homePressed();
             }
         } else if (searcher.getVisibility() == View.VISIBLE) {
@@ -261,7 +261,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         viewPager.setAdapter(adapter);
         viewPager.setPagingEnabled(false);
 
-        scrollView =findViewById(R.id.nested_scroll);
+        scrollView = findViewById(R.id.nested_scroll);
 
         handler = new Handler();
 
@@ -282,17 +282,17 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                 } else if (model.getId() == 2) {
                     viewPager.setCurrentItem(1);
                     if (!pref.getBoolean("isLoged", false)) {
-                        viewPager.getAdapter().notifyDataSetChanged();
+                        Objects.requireNonNull(viewPager.getAdapter()).notifyDataSetChanged();
                     }
                 } else if (model.getId() == 3) {
                     viewPager.setCurrentItem(2);
                     if (!pref.getBoolean("isLoged", false)) {
-                        viewPager.getAdapter().notifyDataSetChanged();
+                        Objects.requireNonNull(viewPager.getAdapter()).notifyDataSetChanged();
                     }
                 } else if (model.getId() == 4) {
                     viewPager.setCurrentItem(3);
                     if (!pref.getBoolean("isLoged", false)) {
-                        viewPager.getAdapter().notifyDataSetChanged();
+                        Objects.requireNonNull(viewPager.getAdapter()).notifyDataSetChanged();
                     }
                 }
                 return null;
@@ -348,15 +348,34 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         aSwitch = findViewById(R.id.next_video);
         tol = findViewById(R.id.toolbar);
         after_video_end = findViewById(R.id.after_video_end);
-        hide.setOnClickListener(new View.OnClickListener() {
+
+        ConstraintLayout hide_layout = findViewById(R.id.clickable_of_title);
+
+        hide_layout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
                 if (hidable.getVisibility() == View.GONE) {
                     hide.setImageResource(R.drawable.ic_keyboard_arrow_up_black_24dp);
+//                    TranslateAnimation anhideKeyboardimate = new TranslateAnimation(
+//                            0,
+//                            0,
+//                            hidable.getHeight(),
+//                            0);
+//                    animate.setDuration(500);
+//                    animate.setFillAfter(true);
+//                    hidable.startAnimation(animate);
                     hidable.setVisibility(View.VISIBLE);
                 } else {
                     hide.setImageResource(R.drawable.ic_keyboard_arrow_down_black_24dp);
+//                    TranslateAnimation animate = new TranslateAnimation(
+//                            0,
+//                            0,
+//                            0,
+//                            hidable.getHeight());
+//                    animate.setDuration(500);
+//                    animate.setFillAfter(true);
+//                    hidable.startAnimation(animate);
                     hidable.setVisibility(View.GONE);
                 }
             }
@@ -371,7 +390,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                 if (!b) {
                     autoplay = false;
                     editor.putBoolean("autoplay", false);
-                    editor.commit();
+                    editor.apply();
                 } else {
                     autoplay = true;
                     editor.putBoolean("autoplay", true);
@@ -409,7 +428,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                 searchView.setVisibility(View.VISIBLE);
                 cancel.setVisibility(View.VISIBLE);
                 voice.setVisibility(View.VISIBLE);
-                getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
                 getSupportActionBar().setDisplayShowHomeEnabled(true);
                 tol.setNavigationIcon(R.drawable.ic_keyboard_back);
                 tol.inflateMenu(R.menu.second_search);
@@ -457,9 +476,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                                 String csvList = pref.getString("set", "");
                                 choises.clear();
                                 String[] items = csvList.split("`,/-");
-                                for (int j = 0; j < items.length; j++) {
-                                    choises.add(items[j]);
-                                }
+                                Collections.addAll(choises, items);
                                 choises.add(textView.getText().toString());
                                 StringBuilder csv = new StringBuilder();
                                 for (String s : choises) {
@@ -470,12 +487,14 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                                 editor.commit();
                             }
                             SearchFragment lastSMSFragment = (SearchFragment) getSupportFragmentManager().findFragmentByTag("categoryVideos");
-                            lastSMSFragment.getVideos(textView.getText().toString());
+                            assert lastSMSFragment != null;
+                            Objects.requireNonNull(lastSMSFragment).getVideos(textView.getText().toString());
                             lastSMSFragment.setVisible(View.GONE);
 
                             InputMethodManager imm = (InputMethodManager) getSystemService(
                                     Context.INPUT_METHOD_SERVICE);
-                            imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
+                            assert imm != null;
+                            Objects.requireNonNull(imm).hideSoftInputFromWindow(searchView.getWindowToken(), 0);
                             return true;
                         }
                         return false;
@@ -484,12 +503,17 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                 cancel.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
+                        SearchFragment lastSMSFragment = (SearchFragment) getSupportFragmentManager().findFragmentByTag("categoryVideos");
                         searchView.setText("");
+                        assert lastSMSFragment != null;
+                        lastSMSFragment.savedChoises();
+                        lastSMSFragment.setVisible(View.VISIBLE);
                     }
                 });
                 searchView.setFocusableInTouchMode(true);
                 searchView.requestFocus();
                 InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                assert imm != null;
                 imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
             }
         });
@@ -511,6 +535,8 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                         sheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
                         break;
                     case BottomSheetBehavior.STATE_SETTLING:
+                        break;
+                    case BottomSheetBehavior.STATE_HALF_EXPANDED:
                         break;
                 }
             }
@@ -557,7 +583,6 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             }
         });
 
-        final LinearLayout layout = findViewById(R.id.linear);
         panel = findViewById(R.id.draggable_view);
         Display display = getWindowManager().getDefaultDisplay();
         Point sizee = new Point();
@@ -567,7 +592,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         panel.setTopViewHeight((int) topView);
         panel.closeToLeft();
         panel.setVisibility(View.GONE);
-        layout.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+        meowBottomNavigation.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
                 float dip = 46f;
@@ -577,8 +602,8 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                         dip,
                         r.getDisplayMetrics()
                 );
-                layout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                panel.setTopViewMarginBottom((int) (layout.getHeight() + px + panel.getTopViewMarginRight()));
+                meowBottomNavigation.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                panel.setTopViewMarginBottom((int) (meowBottomNavigation.getHeight() + px + panel.getTopViewMarginRight()));
             }
         });
 
@@ -658,7 +683,6 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         anim.start();
     }
 
-
     private void hideWithRevealEffect(final View view) {
 
         // get the initial radius for the clipping circle
@@ -688,7 +712,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         tol.getMenu().clear();
         title.setVisibility(View.VISIBLE);
         title.setText(channel_name);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         tol.setNavigationIcon(R.drawable.ic_keyboard_back);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
     }
@@ -697,6 +721,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         searchView.setText(name);
         InputMethodManager imm = (InputMethodManager) getSystemService(
                 Context.INPUT_METHOD_SERVICE);
+        assert imm != null;
         imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
     }
 
@@ -715,7 +740,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         tol.getMenu().clear();
         title.setVisibility(View.VISIBLE);
         title.setText(name);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         tol.setNavigationIcon(R.drawable.ic_keyboard_back);
 
         getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -727,7 +752,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         tol.getMenu().clear();
         title.setVisibility(View.VISIBLE);
         title.setText("Настройки");
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         tol.setNavigationIcon(R.drawable.ic_keyboard_back);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         search.setVisibility(View.GONE);
@@ -745,6 +770,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         if (item.getItemId() == R.id.action_filter) {
             InputMethodManager imm = (InputMethodManager) getSystemService(
                     Context.INPUT_METHOD_SERVICE);
+            assert imm != null;
             imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
             final Dialog dialog = new Dialog(this);
             dialog.setContentView(R.layout.custom_dialog);
@@ -832,20 +858,21 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         title.setVisibility(View.GONE);
         hideWithRevealEffect(searcher);
         Fragment fragment = fragmentManager.findFragmentByTag("categoryVideos");
+        assert fragment != null;
         fragmentManager.beginTransaction().remove(fragment).commit();
         tol.getMenu().clear();
         search.setVisibility(View.VISIBLE);
         if (searchView != null) {
             searchView.setText("");
         }
-        searchView.setVisibility(View.GONE);
+        Objects.requireNonNull(searchView).setVisibility(View.GONE);
         cancel.setVisibility(View.GONE);
         voice.setVisibility(View.GONE);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(false);
         getSupportActionBar().setDisplayShowHomeEnabled(false);
         InputMethodManager imm = (InputMethodManager) getSystemService(
                 Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(searchView.getWindowToken(), 0);
+        Objects.requireNonNull(imm).hideSoftInputFromWindow(searchView.getWindowToken(), 0);
     }
 
     public void MaximizePanel(String url, List<MainPageItems> items, int position) throws JSONException {
@@ -855,11 +882,11 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             ids.clear();
         }
 
-        if (timer!=null){
+        if (timer != null) {
             timer.cancel();
             after_video_end.setVisibility(View.GONE);
         }
-        scrollView.scrollTo(0,0);
+        scrollView.scrollTo(0, 0);
         margin = 1;
         id = items.get(position).getId();
         ids.add(id);
@@ -887,11 +914,11 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
     }
 
     private void addSuggestion(String url) {
-        BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
+        DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
         DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(
                 this,
                 Util.getUserAgent(this, APP_NAME),
-                (DefaultBandwidthMeter) bandwidthMeter);//note the type casting
+                bandwidthMeter);//note the type casting
         ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
         suggestion = new ExtractorMediaSource(Uri.parse(url),
                 dataSourceFactory, extractorsFactory, null, null);
@@ -915,7 +942,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
     }
 
     private void initPlayer() {
-        BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
+        DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
         TrackSelection.Factory videoTrackSelectionFactory =
                 new AdaptiveTrackSelection.Factory(bandwidthMeter);
         trackSelector =
@@ -929,7 +956,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(
                 this,
                 Util.getUserAgent(this, APP_NAME),
-                (DefaultBandwidthMeter) bandwidthMeter);//note the type casting
+                bandwidthMeter);//note the type casting
 
         ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
 
@@ -1019,7 +1046,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                     c = 0;
                     margin = 1;
                     player.prepare(forAutoPlay.get(forAutoPlay.size() - 1));
-                    scrollView.scrollTo(0,0);
+                    scrollView.scrollTo(0, 0);
                 }
             }
         });
@@ -1028,7 +1055,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             @Override
             public void onClick(View view) {
 
-                if (forAutoPlay.size() > 2 && suggestions.size() >=1) {
+                if (forAutoPlay.size() > 2 && suggestions.size() >= 1) {
                     c = 0;
                     margin = 2;
                     forAutoPlay.remove(forAutoPlay.size() - 1);
@@ -1036,7 +1063,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                     player.prepare(forAutoPlay.get(forAutoPlay.size() - 2));
                     forAutoPlay.remove(forAutoPlay.size() - 1);
                     ids.remove(ids.size() - 1);
-                    scrollView.scrollTo(0,0);
+                    scrollView.scrollTo(0, 0);
                 }
             }
         });
@@ -1104,6 +1131,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         panel.computeScroll();
         panel.setTouchEnabled(false);
         exoPlayerView.setOnTouchListener(new View.OnTouchListener() {
+            @SuppressLint({"ClickableViewAccessibility", "SetTextI18n"})
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 switch (motionEvent.getAction()) {
@@ -1213,8 +1241,8 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
             meowBottomNavigation.setVisibility(View.GONE);
             RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) exoPlayerView.getLayoutParams();
-            params.width = params.MATCH_PARENT;
-            params.height = params.MATCH_PARENT;
+            params.width = ViewGroup.LayoutParams.MATCH_PARENT;
+            params.height = ViewGroup.LayoutParams.MATCH_PARENT;
             exoPlayerView.setLayoutParams(params);
             Display display = getWindowManager().getDefaultDisplay();
             Point size = new Point();
@@ -1230,7 +1258,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN, WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
             meowBottomNavigation.setVisibility(View.VISIBLE);
             RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) exoPlayerView.getLayoutParams();
-            params.width = params.MATCH_PARENT;
+            params.width = ViewGroup.LayoutParams.MATCH_PARENT;
             Display display = getWindowManager().getDefaultDisplay();
             Point size = new Point();
             display.getSize(size);
@@ -1289,6 +1317,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         super.onDestroy();
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouch(View view, MotionEvent event) {
         switch (event.getAction()) {
@@ -1526,6 +1555,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
 
             timer = new CountDownTimer(10000, 1000) {
 
+                @SuppressLint("SetTextI18n")
                 public void onTick(long millisUntilFinished) {
                     ready_text.setText("" + millisUntilFinished / 1000);
                 }
@@ -1562,6 +1592,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             });
         }
     }
+
     int c = 0;
 
     @Override
@@ -1580,7 +1611,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
 
     @Override
     public void onPlayerError(ExoPlaybackException error) {
-        c=-1;
+        c = -1;
         Toast.makeText(this, error.getMessage(), Toast.LENGTH_SHORT).show();
     }
 

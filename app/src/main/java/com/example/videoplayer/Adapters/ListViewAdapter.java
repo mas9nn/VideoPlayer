@@ -1,5 +1,6 @@
 package com.example.videoplayer.Adapters;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,7 +16,7 @@ import java.util.List;
 public class ListViewAdapter extends BaseAdapter {
 
     private List<String> mData;
-    Context context;
+    private Context context;
 
     public ListViewAdapter(Context context, List<String> mData) {
         this.context = context;
@@ -48,7 +49,7 @@ public class ListViewAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        View v = LayoutInflater.from(context).inflate(R.layout.list_view_items, parent, false);
+        @SuppressLint("ViewHolder") View v = LayoutInflater.from(context).inflate(R.layout.list_view_items, parent, false);
         TextView text = v.findViewById(R.id.query);
         text.setText(mData.get(position));
         return v;

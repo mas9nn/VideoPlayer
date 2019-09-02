@@ -1,8 +1,8 @@
 package com.example.videoplayer.Models;
 
 public class CategoryItem {
-    String name,id,back_color;
-    int image;
+    private String name,id,back_color;
+    private int image;
 
     public CategoryItem(String name, String id, int image,String back_color) {
         this.name = name;

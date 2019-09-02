@@ -1,8 +1,8 @@
 package com.example.videoplayer.Models;
 
 public class FollowedItems {
-    String logo,id,title;
-    int resource;
+    private String logo,id,title;
+    private int resource;
 
     public FollowedItems(String logo, String id,String title) {
         this.logo = logo;

@@ -46,12 +46,12 @@ public abstract class Transformer {
   private int originalHeight;
   private int originalWidth;
 
-  public Transformer(View view, View parent) {
+  Transformer(View view, View parent) {
     this.view = view;
     this.parent = parent;
   }
 
-  public float getXScaleFactor() {
+  float getXScaleFactor() {
     return xScaleFactor;
   }
 
@@ -59,7 +59,7 @@ public abstract class Transformer {
     this.xScaleFactor = xScaleFactor;
   }
 
-  public float getYScaleFactor() {
+  float getYScaleFactor() {
     return yScaleFactor;
   }
 
@@ -102,7 +102,7 @@ public abstract class Transformer {
     return view;
   }
 
-  protected View getParentView() {
+  View getParentView() {
     return parent;
   }
 

@@ -22,9 +22,9 @@ import java.util.List;
 
 public class PanelAdapter extends RecyclerView.Adapter<PanelAdapter.ViewHolder> {
 
-    List<MainPageItems> list;
-    Context context;
-    ItemSelecListener select;
+    private List<MainPageItems> list;
+    private Context context;
+    private ItemSelecListener select;
 
     public PanelAdapter(List<MainPageItems> list, Context context, ItemSelecListener select) {
         this.list = list;
@@ -97,7 +97,7 @@ public class PanelAdapter extends RecyclerView.Adapter<PanelAdapter.ViewHolder> 
             this.selecListener = selecListener;
         }
 
-        public ViewHolder(@NonNull View itemView,ItemSelecListener selecListener) {
+        ViewHolder(@NonNull View itemView, ItemSelecListener selecListener) {
             super(itemView);
             preview = itemView.findViewById(R.id.preview);
             duration = itemView.findViewById(R.id.duration);

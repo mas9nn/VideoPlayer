@@ -1,5 +1,6 @@
 package com.example.videoplayer.Fragments;
 
+import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
@@ -26,6 +27,7 @@ import com.example.videoplayer.Models.FollowedItems;
 import com.example.videoplayer.Models.MainPageItems;
 import com.example.videoplayer.R;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -34,32 +36,32 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class FollowedFragment extends Fragment implements ItemSelecListener, FollowedAdapter.ItemClickListener {
-    SharedPreferences pref;
-    RecyclerView logos, videos;
-    List<FollowedItems> list_logos = new ArrayList<>();
-    ItemSelecListener itemSelecListener;
-    ItemSelecListener itemSelection;
-    MainPageAdapter adapter;
-    FollowedAdapter logo_adapter;
-    List<MainPageItems> items = new ArrayList<>();
+    private SharedPreferences pref;
+    private RecyclerView logos, videos;
+    private List<FollowedItems> list_logos = new ArrayList<>();
+    private ItemSelecListener itemSelection;
+    private MainPageAdapter adapter;
+    private FollowedAdapter logo_adapter;
+    private List<MainPageItems> items = new ArrayList<>();
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_following, null);
-        pref = getActivity().getApplicationContext().getSharedPreferences("MyPref", 0);
+    public View onCreateView(@NotNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        @SuppressLint("InflateParams") View v = inflater.inflate(R.layout.fragment_following, null);
+        pref = Objects.requireNonNull(getActivity()).getApplicationContext().getSharedPreferences("MyPref", 0);
         LinearLayoutManager layoutManager
                 = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
-        itemSelecListener = this;
+        ItemSelecListener itemSelecListener = this;
         itemSelection = this;
         logos = v.findViewById(R.id.channels_logo);
         videos = v.findViewById(R.id.videos);
         logos.setLayoutManager(layoutManager);
         videos.setLayoutManager(new LinearLayoutManager(getContext()));
         getSubscribedChannels();
-        logo_adapter = new FollowedAdapter( getContext(),list_logos);
+        logo_adapter = new FollowedAdapter(getContext(), list_logos);
 
         logos.setAdapter(logo_adapter);
         logo_adapter.setClickListener(this);
@@ -69,7 +71,7 @@ public class FollowedFragment extends Fragment implements ItemSelecListener, Fol
     @Override
     public void onItemSelectedListener(View view, int position) {
         try {
-            ((MainActivity) getActivity()).MaximizePanel(items.get(position).getUrl(), items, position);
+            ((MainActivity) Objects.requireNonNull(getActivity())).MaximizePanel(items.get(position).getUrl(), items, position);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -81,7 +83,7 @@ public class FollowedFragment extends Fragment implements ItemSelecListener, Fol
 
     }
 
-    public void getSubscribedChannels() {
+    private void getSubscribedChannels() {
         list_logos.clear();
         String requestUrl = "https://video.orzu.org/api/v1.0/?type=get_subscriptions&channel=1";
         StringRequest stringRequest = new StringRequest(Request.Method.POST, requestUrl, new Response.Listener<String>() {
@@ -95,16 +97,19 @@ public class FollowedFragment extends Fragment implements ItemSelecListener, Fol
                         String id = channels.getString("id");
                         String logo = channels.getString("avatar");
                         String title = channels.getString("first_name");
-                        list_logos.add(new FollowedItems(logo, id,title));
-                        getVideos(id);
+                        list_logos.add(new FollowedItems(logo, id, title));
+                        Log.wtf("idebana", id);
+                        if (id != null) {
+                            getVideos(id);
+                        }
                     }
-                    logo_adapter = new FollowedAdapter(getContext(),list_logos);
+                    logo_adapter = new FollowedAdapter(getContext(), list_logos);
                     logos.setAdapter(logo_adapter);
                     logo_adapter.setClickListener(new FollowedAdapter.ItemClickListener() {
                         @Override
                         public void onItemClick(View view, int position) {
-                            ((MainActivity) getActivity()).changePostion();
-                            ((MainActivity) getActivity()).openChannel(list_logos.get(position).getTitle(),list_logos.get(position).getId());
+                            ((MainActivity) Objects.requireNonNull(getActivity())).changePostion();
+                            ((MainActivity) getActivity()).openChannel(list_logos.get(position).getTitle(), list_logos.get(position).getId());
                         }
                     });
                 } catch (JSONException e) {
@@ -128,7 +133,7 @@ public class FollowedFragment extends Fragment implements ItemSelecListener, Fol
             }
         };
 //make the request to your server as indicated in your request url
-        Volley.newRequestQueue(getContext()).add(stringRequest);
+        Volley.newRequestQueue(Objects.requireNonNull(getContext())).add(stringRequest);
     }
 
     private void getVideos(String id) {
@@ -182,7 +187,7 @@ public class FollowedFragment extends Fragment implements ItemSelecListener, Fol
             }
         };
 //make the request to your server as indicated in your request url
-        Volley.newRequestQueue(getContext()).add(stringRequest);
+        Volley.newRequestQueue(Objects.requireNonNull(getContext())).add(stringRequest);
     }
 
     @Override

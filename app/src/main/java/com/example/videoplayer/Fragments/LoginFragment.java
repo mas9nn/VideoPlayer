@@ -1,5 +1,6 @@
 package com.example.videoplayer.Fragments;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -18,7 +19,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -27,16 +27,13 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.videoplayer.Activities.MainActivity;
-import com.example.videoplayer.Activities.RegistrationActivity;
-import com.example.videoplayer.Adapters.FollowedAdapter;
 import com.example.videoplayer.Adapters.LoginAdapter;
-import com.example.videoplayer.Models.FollowedItems;
 import com.example.videoplayer.Models.LoginCategory;
 import com.example.videoplayer.R;
 import com.example.videoplayer.Activities.LoginActivity;
 import com.squareup.picasso.Picasso;
 
-import org.json.JSONArray;
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -44,24 +41,25 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class LoginFragment extends Fragment {
-    Button login;
-    ListView listView;
-    ConstraintLayout layout;
-    LoginAdapter adapter;
-    List<LoginCategory> categories = new ArrayList<>();
-    SharedPreferences pref;
-    SharedPreferences.Editor editor;
-    TextView text,username,email;
-    ImageView image,settings,cover;
-    Switch aSwitch;
+    private Button login;
+    private ListView listView;
+    private ConstraintLayout layout;
+    private LoginAdapter adapter;
+    private List<LoginCategory> categories = new ArrayList<>();
+    private SharedPreferences pref;
+    private SharedPreferences.Editor editor;
+    private TextView text, username, email;
+    private ImageView image, settings, cover;
+    private Switch aSwitch;
 
     @Nullable
     @Override
 
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.login_fragment, null);
+    public View onCreateView(@NotNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        @SuppressLint("InflateParams") View v = inflater.inflate(R.layout.login_fragment, null);
         login = v.findViewById(R.id.login);
         listView = v.findViewById(R.id.list_view);
         layout = v.findViewById(R.id.hidable_login);
@@ -72,30 +70,27 @@ public class LoginFragment extends Fragment {
         cover = v.findViewById(R.id.cover);
         aSwitch = v.findViewById(R.id.switcher);
         settings = v.findViewById(R.id.settings);
-        pref = getActivity().getApplicationContext().getSharedPreferences("MyPref", 0);
+        pref = Objects.requireNonNull(getActivity()).getApplicationContext().getSharedPreferences("MyPref", 0);
         editor = pref.edit();
-        if(pref.getBoolean("dark",false)){
+        if (pref.getBoolean("dark", false)) {
             aSwitch.setChecked(true);
         }
-
         aSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                if(b){
+                if (b) {
                     AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-                    editor.putBoolean("dark",true);
-                    editor.commit();
+                    editor.putBoolean("dark", true);
+                    editor.apply();
                     restartApp();
-                }else{
+                } else {
                     AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-                    editor.putBoolean("dark",false);
+                    editor.putBoolean("dark", false);
                     editor.commit();
                     restartApp();
                 }
             }
         });
-
-
         categories.add(new LoginCategory(R.drawable.ic_my_video, "Мое видео"));
         categories.add(new LoginCategory(R.drawable.ic_history, "История просмотров"));
         categories.add(new LoginCategory(R.drawable.ic_later, "Посмотреть позже"));
@@ -117,28 +112,27 @@ public class LoginFragment extends Fragment {
             public void onClick(View view) {
                 if (login.getText().toString().equals("Войти или зарегистрироваться")) {
                     Intent intent = new Intent(getActivity(), LoginActivity.class);
-                    getActivity().startActivity(intent);
-                }else{
+                    Objects.requireNonNull(getActivity()).startActivity(intent);
+                } else {
+                    restartApp();
                     exitFromAccount();
                     pref.edit().clear().apply();
-                    FragmentTransaction ft = getFragmentManager().beginTransaction();
-                    ft.detach(LoginFragment.this).attach(LoginFragment.this).commit();
                 }
             }
         });
         settings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ((MainActivity)getActivity()).openSettings();
+                ((MainActivity) Objects.requireNonNull(getActivity())).openSettings();
             }
         });
         return v;
     }
 
     private void restartApp() {
-        Intent i = new Intent(getActivity(),MainActivity.class);
+        Intent i = new Intent(getActivity(), MainActivity.class);
         startActivity(i);
-        getActivity().finish();
+        Objects.requireNonNull(getActivity()).finish();
     }
 
     private void exitFromAccount() {
@@ -146,7 +140,7 @@ public class LoginFragment extends Fragment {
         StringRequest stringRequest = new StringRequest(Request.Method.POST, requestUrl, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                Log.d("Registration",response);
+                Log.d("Registration", response);
             }
         }, new Response.ErrorListener() {
             @Override
@@ -163,11 +157,11 @@ public class LoginFragment extends Fragment {
                 return postMap;
             }
         };
-        Volley.newRequestQueue(getActivity()).add(stringRequest);
+        Volley.newRequestQueue(Objects.requireNonNull(getActivity())).add(stringRequest);
     }
 
     private void userInfo() {
-        String requestUrl = "https://video.orzu.org/api/v1.0/?type=get_channel_info&channel_id="+pref.getString("userId", "");
+        String requestUrl = "https://video.orzu.org/api/v1.0/?type=get_channel_info&channel_id=" + pref.getString("userId", "");
         StringRequest stringRequest = new StringRequest(Request.Method.POST, requestUrl, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -198,6 +192,6 @@ public class LoginFragment extends Fragment {
                 return postMap;
             }
         };
-        Volley.newRequestQueue(getActivity()).add(stringRequest);
+        Volley.newRequestQueue(Objects.requireNonNull(getActivity())).add(stringRequest);
     }
 }

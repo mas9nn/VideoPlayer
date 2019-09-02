@@ -57,6 +57,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class PlayerView extends FrameLayout implements AdsLoader.AdViewProvider {
 
@@ -312,10 +313,12 @@ public class PlayerView extends FrameLayout implements AdsLoader.AdViewProvider 
 
 
     public void disableController(){
+        assert controller != null;
         controller.setEnabled(false);
     }
 
     public void enableController() {
+        assert controller != null;
         controller.setEnabled(true);
     }
 
@@ -988,7 +991,7 @@ public class PlayerView extends FrameLayout implements AdsLoader.AdViewProvider 
         if (!useController) {
             return;
         }
-        controller.setShowTimeoutMs(showIndefinitely ? 0 : controllerShowTimeoutMs);
+        Objects.requireNonNull(controller).setShowTimeoutMs(showIndefinitely ? 0 : controllerShowTimeoutMs);
         controller.show();
     }
 

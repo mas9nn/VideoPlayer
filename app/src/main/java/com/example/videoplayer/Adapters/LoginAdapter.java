@@ -1,5 +1,6 @@
 package com.example.videoplayer.Adapters;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,7 +9,6 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.videoplayer.Common.Common;
 import com.example.videoplayer.Models.LoginCategory;
 import com.example.videoplayer.R;
 
@@ -47,7 +47,7 @@ public class LoginAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        View v = LayoutInflater.from(context).inflate(R.layout.list_view_items, parent, false);
+        @SuppressLint("ViewHolder") View v = LayoutInflater.from(context).inflate(R.layout.list_view_items, parent, false);
         TextView text = v.findViewById(R.id.query);
         text.setText(mData.get(position).getNaming());
         ImageView imageView = v.findViewById(R.id.image);

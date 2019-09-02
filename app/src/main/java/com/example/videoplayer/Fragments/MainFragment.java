@@ -1,20 +1,13 @@
 package com.example.videoplayer.Fragments;
 
-import android.animation.Animator;
-import android.graphics.Color;
+import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
-import android.view.animation.AccelerateInterpolator;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -41,14 +34,16 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+
 public class MainFragment extends Fragment implements ItemSelecListener, SwipeRefreshLayout.OnRefreshListener {
-    RecyclerView recyclerView;
-    ArrayList<MainPageItems> items = new ArrayList<>();
-    ItemSelecListener itemSelecListener;
-    MainPageAdapter adapter;
-    ShimmerFrameLayout shimmer;
-    SwipeRefreshLayout mSwipeRefreshLayout;
-    int count = 0;
+    private RecyclerView recyclerView;
+    private ArrayList<MainPageItems> items = new ArrayList<>();
+    private MainPageAdapter adapter;
+    private ShimmerFrameLayout shimmer;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
+    private int count = 0;
+
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         if (savedInstanceState != null) {
@@ -60,8 +55,8 @@ public class MainFragment extends Fragment implements ItemSelecListener, SwipeRe
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_main, null);
-        itemSelecListener = this;
+        @SuppressLint("InflateParams") View v = inflater.inflate(R.layout.fragment_main, null);
+        ItemSelecListener itemSelecListener = this;
         shimmer = (ShimmerFrameLayout) v.findViewById(R.id.shimmer_view_container);
         shimmer.startShimmer();
         recyclerView = v.findViewById(R.id.recycler);
@@ -94,10 +89,6 @@ public class MainFragment extends Fragment implements ItemSelecListener, SwipeRe
 
             }
         });
-        if (savedInstanceState != null) {
-            //Restore the fragment's state here
-
-        }
         return v;
     }
 
@@ -110,7 +101,7 @@ public class MainFragment extends Fragment implements ItemSelecListener, SwipeRe
     @Override
     public void onItemSelectedListener(View view, int position) {
         try {
-            ((MainActivity) getActivity()).changePostion();
+            ((MainActivity) Objects.requireNonNull(getActivity())).changePostion();
             Common.MainFragment = true;
             ((MainActivity) getActivity()).MaximizePanel(items.get(position).getUrl(), items, position);
         } catch (JSONException e) {
@@ -194,7 +185,7 @@ public class MainFragment extends Fragment implements ItemSelecListener, SwipeRe
             }
         };
 //make the request to your server as indicated in your request url
-        Volley.newRequestQueue(getContext()).add(stringRequest);
+        Volley.newRequestQueue(Objects.requireNonNull(getContext())).add(stringRequest);
     }
 
     @Override

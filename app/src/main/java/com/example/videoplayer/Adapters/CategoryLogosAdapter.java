@@ -1,20 +1,14 @@
 package com.example.videoplayer.Adapters;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.example.videoplayer.Common.Common;
 import com.example.videoplayer.Models.FollowedItems;
 import com.example.videoplayer.R;
-import com.squareup.picasso.Picasso;
-
 import java.util.List;
 
 public class CategoryLogosAdapter extends RecyclerView.Adapter<CategoryLogosAdapter.ViewHolder> {

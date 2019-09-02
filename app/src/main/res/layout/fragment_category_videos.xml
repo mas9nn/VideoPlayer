@@ -11,6 +11,7 @@
         android:id="@+id/videos_in_search"
         android:background="?attr/back"
         android:layout_width="match_parent"
+        android:overScrollMode="never"
         android:layout_height="match_parent"
         android:visibility="visible"></androidx.recyclerview.widget.RecyclerView>
 

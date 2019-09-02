@@ -39,25 +39,26 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 
 public class SearchFragment extends Fragment implements ItemSelecListener {
 
-    ListView listView;
-    RecyclerView recyclerView;
-    List<String> choices = new ArrayList<>();
-    ListViewAdapter listViewAdapter;
-    ItemSelecListener itemSelecListenerl;
-    List<MainPageItems> items = new ArrayList<>();
-    PanelAdapter adapter;
-    SharedPreferences pref;
+    private ListView listView;
+    private RecyclerView recyclerView;
+    private List<String> choices = new ArrayList<>();
+    private ListViewAdapter listViewAdapter;
+    private ItemSelecListener itemSelecListenerl;
+    private List<MainPageItems> items = new ArrayList<>();
+    private PanelAdapter adapter;
+    private SharedPreferences pref;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_search, null);
         listView = v.findViewById(R.id.listview);
-        pref = getContext().getSharedPreferences("MyPref", 0);
+        pref = Objects.requireNonNull(getContext()).getSharedPreferences("MyPref", 0);
         recyclerView = v.findViewById(R.id.videos_in_search);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         listView.setDivider(null);
@@ -67,7 +68,8 @@ public class SearchFragment extends Fragment implements ItemSelecListener {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                ((MainActivity) getActivity()).hideKeyboard(choices.get(i));
+                Log.wtf("wtfishapening","log");
+                ((MainActivity) Objects.requireNonNull(getActivity())).hideKeyboard(choices.get(i));
                 getVideos(choices.get(i));
                 listView.setVisibility(View.GONE);
                 recyclerView.setVisibility(View.VISIBLE);
@@ -83,15 +85,17 @@ public class SearchFragment extends Fragment implements ItemSelecListener {
             String[] splited = csvList.split("`,/-");
             LinkedHashSet<String> lhSetColors =
                     new LinkedHashSet<String>(Arrays.asList(splited));
-            String[] items = lhSetColors.toArray(new String[lhSetColors.size()]);
+            String[] items = lhSetColors.toArray(new String[0]);
             Collections.addAll(choices, items);
             Collections.reverse(choices);
             listViewAdapter = new ListViewAdapter(getContext(), choices);
             listView.setAdapter(listViewAdapter);
+
         }
     }
 
     public void getVideos(String query) {
+        Log.wtf("wtfishapening","log");
         items.clear();
         String requestUrl = "https://video.orzu.org/api/v1.0/?type=search_videos&keyword=" + query;
         StringRequest stringRequest = new StringRequest(Request.Method.POST, requestUrl, new Response.Listener<String>() {
@@ -142,7 +146,7 @@ public class SearchFragment extends Fragment implements ItemSelecListener {
             }
         };
 //make the request to your server as indicated in your request url
-        Volley.newRequestQueue(getContext()).add(stringRequest);
+        Volley.newRequestQueue(Objects.requireNonNull(getContext())).add(stringRequest);
     }
 
     public void setVisible(int visibility) {
@@ -198,7 +202,7 @@ public class SearchFragment extends Fragment implements ItemSelecListener {
             }
         };
 //make the request to your server as indicated in your request url
-        Volley.newRequestQueue(getContext()).add(stringRequest);
+        Volley.newRequestQueue(Objects.requireNonNull(getContext())).add(stringRequest);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.example.videoplayer.Activities;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -32,7 +33,9 @@ public class LoginActivity extends AppCompatActivity {
     Button login;
     SharedPreferences pref;
     TextView lnkRegister;
-    SharedPreferences.Editor editor ;
+    SharedPreferences.Editor editor;
+
+    @SuppressLint("CommitPrefEdits")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,7 +57,7 @@ public class LoginActivity extends AppCompatActivity {
         lnkRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(LoginActivity.this,RegistrationActivity.class);
+                Intent intent = new Intent(LoginActivity.this, RegistrationActivity.class);
                 startActivity(intent);
                 finish();
             }
@@ -70,11 +73,13 @@ public class LoginActivity extends AppCompatActivity {
                     JSONObject j = new JSONObject(response);
                     JSONObject data = j.getJSONObject("data");
                     String status = j.getString("api_status");
-                    if(Integer.parseInt(status)==200){
-                        editor.putBoolean("isLoged",true);
-                        editor.putString("userId",data.getString("user_id"));
-                        editor.putString("session",data.getString("session_id"));
+                    if (Integer.parseInt(status) == 200) {
+                        editor.putBoolean("isLoged", true);
+                        editor.putString("userId", data.getString("user_id"));
+                        editor.putString("session", data.getString("session_id"));
                         editor.commit();
+                        Intent i = new Intent(LoginActivity.this, MainActivity.class);
+                        startActivity(i);
                         finish();
                     }
                 } catch (JSONException e) {

@@ -1,8 +1,8 @@
 package com.example.videoplayer.Models;
 
 public class ListViewItems {
-    int resource;
-    String name;
+    private int resource;
+    private String name;
 
     public ListViewItems(int resource, String name) {
         this.resource = resource;

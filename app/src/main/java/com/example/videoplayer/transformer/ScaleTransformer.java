@@ -15,7 +15,6 @@
  */
 package com.example.videoplayer.transformer;
 
-import android.util.Log;
 import android.view.View;
 
 import com.nineoldandroids.view.ViewHelper;

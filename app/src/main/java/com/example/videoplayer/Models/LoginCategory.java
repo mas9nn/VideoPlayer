@@ -1,8 +1,8 @@
 package com.example.videoplayer.Models;
 
 public class LoginCategory {
-    int icon;
-    String naming;
+    private int icon;
+    private String naming;
 
     public LoginCategory(int icon, String naming) {
         this.icon = icon;

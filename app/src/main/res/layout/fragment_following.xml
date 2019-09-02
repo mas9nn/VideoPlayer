@@ -2,8 +2,8 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:background="?attr/back"
     android:layout_height="match_parent"
+    android:background="?attr/back"
     android:orientation="vertical">
 
 
@@ -12,18 +12,18 @@
         android:layout_height="match_parent">
 
         <androidx.cardview.widget.CardView
-            app:layout_constraintTop_toTopOf="parent"
             android:id="@+id/card"
-            android:background="?attr/back"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:background="?attr/back"
+            app:layout_constraintTop_toTopOf="parent">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/channels_logo"
-                android:background="?attr/back"
-                android:overScrollMode="never"
                 android:layout_width="match_parent"
                 android:layout_height="90dp"
+                android:background="?attr/back"
+                android:overScrollMode="never"
                 app:layout_constraintTop_toTopOf="parent"></androidx.recyclerview.widget.RecyclerView>
         </androidx.cardview.widget.CardView>
 
@@ -31,9 +31,11 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/videos"
             android:layout_width="match_parent"
-            android:overScrollMode="never"
             android:layout_height="0dp"
             android:layout_marginTop="20dp"
+            android:clipToPadding="false"
+            android:overScrollMode="never"
+            android:paddingBottom="60dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@id/card"></androidx.recyclerview.widget.RecyclerView>
     </androidx.constraintlayout.widget.ConstraintLayout>

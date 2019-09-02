@@ -1,12 +1,15 @@
 package com.example.videoplayer.Activities;
+
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -14,6 +17,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.videoplayer.R;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -26,7 +30,9 @@ public class RegistrationActivity extends AppCompatActivity {
     EditText name, email, password, confirmPassword;
     Button register;
     SharedPreferences pref;
-    SharedPreferences.Editor editor ;
+    SharedPreferences.Editor editor;
+
+    @SuppressLint("CommitPrefEdits")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,18 +46,16 @@ public class RegistrationActivity extends AppCompatActivity {
         register = findViewById(R.id.register);
 
 
-
-
         register.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(name.getText().length()!=0&&email.getText().length()!=0&&password.getText().length()!=0&&confirmPassword.getText().length()!=0) {
+                if (name.getText().length() != 0 && email.getText().length() != 0 && password.getText().length() != 0 && confirmPassword.getText().length() != 0) {
                     try {
                         requestToRegistr();
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                }else
+                } else
                     Toast.makeText(RegistrationActivity.this, "Fill all fields", Toast.LENGTH_SHORT).show();
             }
         });
@@ -69,10 +73,10 @@ public class RegistrationActivity extends AppCompatActivity {
                     JSONObject j = new JSONObject(response);
                     JSONObject data = j.getJSONObject("data");
                     String status = j.getString("api_status");
-                    if(Integer.parseInt(status)==200){
-                        editor.putBoolean("isLoged",true);
-                        editor.putString("userId",data.getString("user_id"));
-                        editor.putString("session",data.getString("session_id"));
+                    if (Integer.parseInt(status) == 200) {
+                        editor.putBoolean("isLoged", true);
+                        editor.putString("userId", data.getString("user_id"));
+                        editor.putString("session", data.getString("session_id"));
                         editor.commit();
                         finish();
                     }

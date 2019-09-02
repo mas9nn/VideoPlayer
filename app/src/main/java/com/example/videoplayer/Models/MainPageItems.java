@@ -1,11 +1,11 @@
 package com.example.videoplayer.Models;
 
-import android.os.Parcel;
+import
+android.os.Parcel;
 import android.os.Parcelable;
-
 public class MainPageItems implements Parcelable {
-    String preview_image, duration, name, channel_name, views, days;
-    String url, id;
+    private String preview_image, duration, name, channel_name, views, days;
+    private String url, id;
 
     public MainPageItems() {
     }

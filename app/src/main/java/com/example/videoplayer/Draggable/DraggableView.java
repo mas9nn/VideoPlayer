@@ -1,10 +1,10 @@
 package com.example.videoplayer.Draggable;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.RelativeLayout;
@@ -363,6 +363,7 @@ public class DraggableView extends RelativeLayout {
 
 
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
         boolean isDragViewHit = isViewHit(dragView, (int) ev.getX(), (int) ev.getY());
@@ -717,15 +718,13 @@ public class DraggableView extends RelativeLayout {
      * @param slideOffset to apply
      * @return true if the view is slided.
      */
-    private boolean smoothSlideTo(float slideOffset) {
+    private void smoothSlideTo(float slideOffset) {
         final int topBound = getPaddingTop();
         int x = (int) (slideOffset * (getWidth() - transformer.getMinWidthPlusMarginRight()));
         int y = (int) (topBound + slideOffset * getVerticalDragRange());
         if (viewDragHelper.smoothSlideViewTo(dragView, x, y)) {
             ViewCompat.postInvalidateOnAnimation(this);
-            return true;
         }
-        return false;
     }
 
     /**

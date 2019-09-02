@@ -1,8 +1,8 @@
 package com.example.videoplayer.Fragments;
 
+import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +28,7 @@ import com.example.videoplayer.Models.MainPageItems;
 import com.example.videoplayer.R;
 import com.facebook.shimmer.ShimmerFrameLayout;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -35,32 +36,23 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 
 public class ChannelVideosFragment extends Fragment implements ItemSelecListener, SwipeRefreshLayout.OnRefreshListener {
-    RecyclerView recyclerView;
-    ArrayList<MainPageItems> items = new ArrayList<>();
-    ItemSelecListener itemSelecListener;
-    MainPageAdapter adapter;
-    ShimmerFrameLayout shimmer;
-    SwipeRefreshLayout mSwipeRefreshLayout;
-    int count = 0;
-    SharedPreferences pref;
+    private RecyclerView recyclerView;
+    private ArrayList<MainPageItems> items = new ArrayList<>();
+    private MainPageAdapter adapter;
+    private ShimmerFrameLayout shimmer;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
+    private int count = 0;
+    private SharedPreferences pref;
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        if (savedInstanceState != null) {
-            //Restore the fragment's state here
-
-        }
-        super.onActivityCreated(savedInstanceState);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_main, null);
-        itemSelecListener = this;
-        pref = getActivity().getApplicationContext().getSharedPreferences("MyPref", 0);
+    public View onCreateView(@NotNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        @SuppressLint("InflateParams") View v = inflater.inflate(R.layout.fragment_main, null);
+        ItemSelecListener itemSelecListener = this;
+        pref = Objects.requireNonNull(getActivity()).getApplicationContext().getSharedPreferences("MyPref", 0);
         shimmer = (ShimmerFrameLayout) v.findViewById(R.id.shimmer_view_container);
         shimmer.startShimmer();
         recyclerView = v.findViewById(R.id.recycler);
@@ -93,10 +85,7 @@ public class ChannelVideosFragment extends Fragment implements ItemSelecListener
 
             }
         });
-        if (savedInstanceState != null) {
-            //Restore the fragment's state here
-
-        }
+        //Restore the fragment's state here
         return v;
     }
 
@@ -109,7 +98,7 @@ public class ChannelVideosFragment extends Fragment implements ItemSelecListener
     @Override
     public void onItemSelectedListener(View view, int position) {
         try {
-            ((MainActivity) getActivity()).changePostion();
+            ((MainActivity) Objects.requireNonNull(getActivity())).changePostion();
             ((MainActivity) getActivity()).MaximizePanel(items.get(position).getUrl(), items, position);
         } catch (JSONException e) {
             e.printStackTrace();
@@ -154,7 +143,7 @@ public class ChannelVideosFragment extends Fragment implements ItemSelecListener
                             pageItems.setUrl(object.getString("video_location"));
                             pageItems.setId(object.getString("video_id"));
                             if (!items.contains(pageItems)) {
-                                items.add(0,pageItems);
+                                items.add(0, pageItems);
                             }
                             adapter.notifyDataSetChanged();
                             mSwipeRefreshLayout.setRefreshing(false);
@@ -195,7 +184,7 @@ public class ChannelVideosFragment extends Fragment implements ItemSelecListener
             }
         };
 //make the request to your server as indicated in your request url
-        Volley.newRequestQueue(getContext()).add(stringRequest);
+        Volley.newRequestQueue(Objects.requireNonNull(getContext())).add(stringRequest);
     }
 
     @Override
