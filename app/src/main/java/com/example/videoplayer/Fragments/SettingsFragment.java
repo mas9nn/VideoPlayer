@@ -8,8 +8,10 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -26,7 +28,8 @@ import java.util.Objects;
 public class SettingsFragment extends Fragment {
     private SharedPreferences pref;
     private SharedPreferences.Editor editor;
-    private TextView forward, backward, seconds_forward, seconds_backward, clear_history;
+    private TextView seconds_forward;
+    private TextView seconds_backward;
     private int back, frw;
 
     @SuppressLint("SetTextI18n")
@@ -36,15 +39,22 @@ public class SettingsFragment extends Fragment {
         View v = inflater.inflate(R.layout.fragment_settings, null);
         pref = Objects.requireNonNull(getActivity()).getApplicationContext().getSharedPreferences("MyPref", 0);
         editor = pref.edit();
-        forward = v.findViewById(R.id.forward_peremotka);
-        backward = v.findViewById(R.id.backforw_peremotka);
+        TextView forward = v.findViewById(R.id.forward_peremotka);
+        TextView backward = v.findViewById(R.id.backforw_peremotka);
         seconds_backward = v.findViewById(R.id.seconds_backford);
         seconds_forward = v.findViewById(R.id.seconds_forward);
-        clear_history = v.findViewById(R.id.clear_history);
+        TextView clear_history = v.findViewById(R.id.clear_history);
+        Switch autoplay = v.findViewById(R.id.switch_autoplay);
 
+        autoplay.setChecked(pref.getBoolean("main_autoplay",false));
 
-
-
+        autoplay.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                editor.putBoolean("main_autoplay", b);
+                editor.apply();
+            }
+        });
 
         seconds_backward.setText(pref.getInt("backward", 5) + "");
         seconds_forward.setText(pref.getInt("forward", 5) + "");

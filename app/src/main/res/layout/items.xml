@@ -114,7 +114,6 @@
                 android:id="@+id/name_of_video"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:layout_marginTop="4dp"
                 android:text="SHORT NEWS"
                 android:textColor="?attr/textColor"
                 app:layout_constraintBottom_toTopOf="@id/channel_name"

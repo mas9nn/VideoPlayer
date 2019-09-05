@@ -49,6 +49,7 @@ public class MainPageAdapter extends RecyclerView.Adapter<MainPageAdapter.ViewHo
         holder.views.setText(list.get(position).getViews());
         holder.days.setText(list.get(position).getDays());
         holder.button.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View view) {
 

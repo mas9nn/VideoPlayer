@@ -475,6 +475,7 @@
             android:layout_width="match_parent"
             android:layout_height="200dp"
             android:background="@android:color/black"
+            android:onClick="onClick"
             app:auto_show="false"
             app:controller_layout_id="@layout/exo_player_control_view"
             app:hide_on_touch="false"

@@ -51,9 +51,11 @@ public class ViewPagerAdapter extends FragmentStatePagerAdapter {
         instantiatedFragments.remove(position);
         super.destroyItem(container, position, object);
     }
-
+    public Fragment getCurrentFragment(int pos) {
+        return getFragment(pos);
+    }
     @Nullable
-    Fragment getFragment(final int position) {
+     Fragment getFragment(final int position) {
         final WeakReference<Fragment> wr = instantiatedFragments.get(position);
         if (wr != null) {
             return wr.get();

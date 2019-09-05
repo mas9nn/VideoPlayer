@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.RelativeLayout;
@@ -634,10 +635,11 @@ public class DraggableView extends RelativeLayout {
         int screenX = parentLocation[0] + x;
         int screenY = parentLocation[1] + y;
         if (isMinimized()) {
+            Log.wtf("transformer",transformer.getMarginBottom()+"");
             return screenX >= viewLocation[0]
                     && screenX < viewLocation[0] + view.getWidth()
                     && screenY >= viewLocation[1]
-                    && screenY < viewLocation[1] + (view.getHeight() - transformer.getMarginBottom());
+                    && screenY < viewLocation[1] + (view.getHeight()-transformer.getMarginBottom()-20);
         } else {
             return screenX >= viewLocation[0]
                     && screenX < viewLocation[0] + view.getWidth()

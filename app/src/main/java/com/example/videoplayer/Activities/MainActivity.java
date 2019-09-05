@@ -18,6 +18,7 @@ import android.content.res.Resources;
 
 import android.graphics.Point;
 
+import android.media.AudioManager;
 import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -224,9 +225,9 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         if (panel.isMaximized()) {
             if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
                 setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
-            } else if (orientation==Configuration.ORIENTATION_PORTRAIT){
+            } else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
                 panel.minimize();
-            }else if (searcher.getVisibility() == View.VISIBLE){
+            } else if (searcher.getVisibility() == View.VISIBLE) {
                 homePressed();
             }
         } else if (searcher.getVisibility() == View.VISIBLE) {
@@ -357,25 +358,11 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
 
                 if (hidable.getVisibility() == View.GONE) {
                     hide.setImageResource(R.drawable.ic_keyboard_arrow_up_black_24dp);
-//                    TranslateAnimation anhideKeyboardimate = new TranslateAnimation(
-//                            0,
-//                            0,
-//                            hidable.getHeight(),
-//                            0);
-//                    animate.setDuration(500);
-//                    animate.setFillAfter(true);
-//                    hidable.startAnimation(animate);
+
                     hidable.setVisibility(View.VISIBLE);
                 } else {
                     hide.setImageResource(R.drawable.ic_keyboard_arrow_down_black_24dp);
-//                    TranslateAnimation animate = new TranslateAnimation(
-//                            0,
-//                            0,
-//                            0,
-//                            hidable.getHeight());
-//                    animate.setDuration(500);
-//                    animate.setFillAfter(true);
-//                    hidable.startAnimation(animate);
+
                     hidable.setVisibility(View.GONE);
                 }
             }
@@ -613,15 +600,22 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                 panel.setClickToMaximizeEnabled(false);
                 panel.setClickToMinimizeEnabled(false);
                 exoPlayerView.performClick();
+                MainFragment lastSMSFragment = (MainFragment) adapter.getCurrentFragment(0);
+                if (lastSMSFragment != null) {
+                    lastSMSFragment.playVideo(false);
+                }
             }
 
             @Override
             public void onMinimized() {
                 if (exoPlayerView != null) {
                     exoPlayerView.hideController();
-                    // handler.removeCallbacks();
                     panel.setClickToMaximizeEnabled(true);
                     panel.setTopViewHeight((int) topView);
+                    MainFragment lastSMSFragment = (MainFragment) adapter.getCurrentFragment(0);
+                    if (lastSMSFragment != null) {
+                        lastSMSFragment.playVideo(false);
+                    }
                 }
             }
 
@@ -630,6 +624,10 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                 player.setPlayWhenReady(false);
                 panel.setVisibility(View.GONE);
                 releasePlayer();
+                MainFragment lastSMSFragment = (MainFragment) adapter.getCurrentFragment(0);
+                if (lastSMSFragment != null) {
+                    lastSMSFragment.playVideo(true);
+                }
             }
 
             @Override
@@ -637,6 +635,10 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                 player.setPlayWhenReady(false);
                 panel.setVisibility(View.GONE);
                 releasePlayer();
+                MainFragment lastSMSFragment = (MainFragment) adapter.getCurrentFragment(0);
+                if (lastSMSFragment != null) {
+                    lastSMSFragment.playVideo(true);
+                }
             }
         });
 
@@ -1237,7 +1239,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
 
         super.onConfigurationChanged(newConfig);
 
-        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE && panel.isMaximized()) {
             this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
             meowBottomNavigation.setVisibility(View.GONE);
             RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) exoPlayerView.getLayoutParams();

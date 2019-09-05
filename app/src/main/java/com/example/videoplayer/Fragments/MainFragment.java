@@ -1,7 +1,11 @@
 package com.example.videoplayer.Fragments;
 
 import android.annotation.SuppressLint;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,10 +23,15 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.RequestManager;
+import com.bumptech.glide.request.RequestOptions;
 import com.example.videoplayer.Adapters.MainPageAdapter;
+import com.example.videoplayer.Adapters.MediaRecyclerAdapter;
 import com.example.videoplayer.Common.Common;
 import com.example.videoplayer.Interfaces.ItemSelecListener;
 import com.example.videoplayer.Activities.MainActivity;
+import com.example.videoplayer.Layouts.ExoPlayerRecyclerView;
 import com.example.videoplayer.Models.MainPageItems;
 import com.example.videoplayer.R;
 import com.facebook.shimmer.ShimmerFrameLayout;
@@ -36,13 +45,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class MainFragment extends Fragment implements ItemSelecListener, SwipeRefreshLayout.OnRefreshListener {
-    private RecyclerView recyclerView;
+public class MainFragment extends Fragment implements ItemSelecListener, SwipeRefreshLayout.OnRefreshListener, MediaRecyclerAdapter.ItemClickListener {
+    private ExoPlayerRecyclerView recyclerView;
     private ArrayList<MainPageItems> items = new ArrayList<>();
-    private MainPageAdapter adapter;
+    private MediaRecyclerAdapter adapter;
+    private boolean firstTime = true;
     private ShimmerFrameLayout shimmer;
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private int count = 0;
+    private SharedPreferences pref;
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -53,10 +64,18 @@ public class MainFragment extends Fragment implements ItemSelecListener, SwipeRe
         super.onActivityCreated(savedInstanceState);
     }
 
+    private RequestManager initGlide() {
+        RequestOptions options = new RequestOptions();
+
+        return Glide.with(this)
+                .setDefaultRequestOptions(options);
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         @SuppressLint("InflateParams") View v = inflater.inflate(R.layout.fragment_main, null);
-        ItemSelecListener itemSelecListener = this;
+        pref = Objects.requireNonNull(getActivity()).getApplicationContext().getSharedPreferences("MyPref", 0);
+        Log.wtf("postiontion", items.size() + "");
         shimmer = (ShimmerFrameLayout) v.findViewById(R.id.shimmer_view_container);
         shimmer.startShimmer();
         recyclerView = v.findViewById(R.id.recycler);
@@ -67,8 +86,20 @@ public class MainFragment extends Fragment implements ItemSelecListener, SwipeRe
                 android.R.color.holo_green_dark,
                 android.R.color.holo_orange_dark,
                 android.R.color.holo_blue_dark);
-        adapter = new MainPageAdapter(items, getContext(), itemSelecListener);
+        adapter = new MediaRecyclerAdapter(getContext(),items, initGlide(), this);
+        items.clear();
+        adapter.notifyDataSetChanged();
         recyclerView.setAdapter(adapter);
+        recyclerView.isPlayVideo(pref.getBoolean("main_autoplay", false));
+        if (firstTime) {
+            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                @Override
+                public void run() {
+                    recyclerView.playVideo(false);
+                }
+            });
+            firstTime = false;
+        }
         mSwipeRefreshLayout.post(new Runnable() {
 
             @Override
@@ -92,10 +123,18 @@ public class MainFragment extends Fragment implements ItemSelecListener, SwipeRe
         return v;
     }
 
+
     @Override
     public void onStop() {
-
+        recyclerView.onPausePlayer();
+        recyclerView.isPlayVideo(false);
         super.onStop();
+    }
+
+    @Override
+    public void onDestroy() {
+        Log.wtf("mainfragment","destroyed");
+        super.onDestroy();
     }
 
     @Override
@@ -156,6 +195,7 @@ public class MainFragment extends Fragment implements ItemSelecListener, SwipeRe
                             e.printStackTrace();
                         }
                     }
+                    recyclerView.setMediaObjects(items);
                     shimmer.setVisibility(View.GONE);
                     recyclerView.setVisibility(View.VISIBLE);
                 } catch (JSONException e) {
@@ -198,6 +238,27 @@ public class MainFragment extends Fragment implements ItemSelecListener, SwipeRe
             items.clear();
             sendWorkPostRequest();
             adapter.notifyDataSetChanged();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void playVideo(boolean b) {
+        recyclerView.isPlayVideo(b);
+        if (!b) {
+            recyclerView.onPausePlayer();
+        }
+    }
+
+
+    @Override
+    public void onItemClick(View view, int position) {
+        Log.wtf("clicked", "new recycler");
+        ((MainActivity) Objects.requireNonNull(getActivity())).changePostion();
+        Common.MainFragment = true;
+        try {
+            ((MainActivity) getActivity()).MaximizePanel(items.get(position).getUrl(), items, position);
+            recyclerView.onPausePlayer();
         } catch (JSONException e) {
             e.printStackTrace();
         }

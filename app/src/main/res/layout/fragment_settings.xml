@@ -81,5 +81,25 @@
         android:textSize="15sp"
         app:layout_constraintTop_toBottomOf="@id/account_set" />
 
+    <TextView
+        android:id="@+id/autoplay_in_main"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="Автовоспризведение"
+        android:textColor="?attr/textColor"
+        android:textSize="19sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@id/clear_history" />
+
+    <Switch
+        android:id="@+id/switch_autoplay"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="?attr/textColor"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/autoplay_in_main"
+        app:layout_constraintTop_toTopOf="@id/autoplay_in_main"/>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
