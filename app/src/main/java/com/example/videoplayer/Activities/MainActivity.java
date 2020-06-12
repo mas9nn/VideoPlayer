@@ -79,8 +79,12 @@ import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.squareup.picasso.Picasso;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -163,7 +167,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
     List<MainPageItems> suggestions = new ArrayList<>();
     SharedPreferences pref;
     DefaultTrackSelector trackSelector;
-    String waterUrl = "https://video.orzu.org/upload/videos/2019/06/1DZjZiEBOEfGfcAslyHh_25_38aa4abb775fd1e9d30afdbf21561613_video_240p_converted.mp4";
+    String waterUrl = "https://firebasestorage.googleapis.com/v0/b/videoplayerapi-7bccd.appspot.com/o/%D0%9D%D1%83%D1%80%D0%BB%D0%B0%D0%BD%D0%BE%D0%B2%20%D0%90%D0%BB%D0%BC%D0%B0%D1%81.mp4?alt=media&token=b8d90c8e-afc2-43dd-8083-7d071bf92366";
     String id = "";
     String url_of_data = "";
     String id_of_category = "";
@@ -207,6 +211,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
 
     CountDownTimer timer;
 
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -234,7 +239,6 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             homePressed();
         } else if (panel.isMinimized()) {
             panel.closeToLeft();
-
         } else {
             super.onBackPressed();
         }
@@ -562,9 +566,9 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
                 Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
                 sharingIntent.setType("text/plain");
                 if (suggestions.size() != 0) {
-                    sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, "https://video.orzu.org/watch/" + ids.get(ids.size() - 2));
+                    sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, "https://firebasestorage.googleapis.com/v0/b/videoplayerapi-7bccd.appspot.com/o/%D0%9D%D1%83%D1%80%D0%BB%D0%B0%D0%BD%D0%BE%D0%B2%20%D0%90%D0%BB%D0%BC%D0%B0%D1%81.mp4?alt=media&token=b8d90c8e-afc2-43dd-8083-7d071bf92366");
                 } else {
-                    sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, "https://video.orzu.org/watch/" + ids.get(ids.size() - 1));
+                    sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, "https://firebasestorage.googleapis.com/v0/b/videoplayerapi-7bccd.appspot.com/o/%D0%9D%D1%83%D1%80%D0%BB%D0%B0%D0%BD%D0%BE%D0%B2%20%D0%90%D0%BB%D0%BC%D0%B0%D1%81.mp4?alt=media&token=b8d90c8e-afc2-43dd-8083-7d071bf92366");
                 }
                 startActivity(Intent.createChooser(sharingIntent, "share:"));
             }
@@ -662,7 +666,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             initPlayer();
             try {
                 requstByVideo(id);
-            } catch (JSONException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
             lastPosition = position;
@@ -1335,126 +1339,182 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         }
         return true;
     }
-
-    private void requstByVideo(String id) throws JSONException {
-
-        String requestUrl = "https://video.orzu.org/api/v1.0/?type=get_video_details&video_id=" + id;
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, requestUrl, new Response.Listener<String>() {
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
+    public void requstByVideo(String id){
+        db.collection("Videos").document("1").collection("video_details").document("1").get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
-            public void onResponse(String response) {
-                try {
-                    JSONObject j = new JSONObject(response);
-                    JSONObject data = j.getJSONObject("data");
-                    JSONObject owner = data.getJSONObject("owner");
-                    name.setText(data.getString("title"));
-                    views.setText(data.getString("views"));
-                    likes.setText(data.getString("likes"));
-                    dislikes.setText(data.getString("dislikes"));
-                    channel_name.setText(owner.getString("first_name"));
-                    channel_names.setText(owner.getString("first_name"));
-                    name_of_video.setText(data.getString("title"));
-                    Picasso.get().load(owner.getString("avatar")).into(channel_logo);
-                    channel_id = owner.getString("id");
-                    followers.setText(data.getString("dislikes"));
-                    date.setText(data.getString("time_alpha"));
-                    name_of_video_bottom.setText(data.getString("title"));
-                    name_of_category.setText(data.getString("category_name"));
-                    url_of_data = data.getString("video_location");
+            public void onSuccess(DocumentSnapshot data) {
+                name.setText(data.getString("title"));
+                views.setText(data.getString("views"));
+                likes.setText(data.getString("likes"));
+                dislikes.setText(data.getString("dislikes"));
+                channel_name.setText(data.getString("first_name"));
+                channel_names.setText(data.getString("first_name"));
+                name_of_video.setText(data.getString("title"));
+                Picasso.get().load(data.getString("avatar")).into(channel_logo);
+                channel_id = data.getString("id");
+                followers.setText(data.getString("dislikes"));
+                date.setText(data.getString("time_alpha"));
+                name_of_video_bottom.setText(data.getString("title"));
+                name_of_category.setText(data.getString("category_name"));
+                url_of_data = data.getString("video_location");
 
-                    if (data.getString("is_liked").equals("1")) {
-                        like.setImageResource(R.drawable.ic_favorite_blue);
-                    } else
-                        like.setImageResource(R.drawable.ic_favorite_black);
-                    if (data.getString("is_disliked").equals("1")) {
+                if (data.getString("is_liked").equals("1")) {
+                    like.setImageResource(R.drawable.ic_favorite_blue);
+                } else
+                    like.setImageResource(R.drawable.ic_favorite_black);
+                if (data.getString("is_disliked").equals("1")) {
 
-                    } else {
+                } else {
 
-                    }
-                    if (data.getString("is_subscribed").equals("1")) {
-                        follow.setText("Подписка");
-                        followed = true;
-                    } else {
-                        follow.setText("подписаться");
-                        followed = false;
-                    }
-                    quality_has.clear();
-                    quality_has.add("Авто");
-                    for (int i = 0; i < quality.size(); i++) {
-                        if (data.getString(quality.get(i)).equals("1")) {
-                            quality_has.add(quality.get(i));
-                        }
-                    }
-                    initQuality();
-                    progressBar.setVisibility(View.GONE);
-                    bottom_constraint.setVisibility(View.VISIBLE);
-                    shimmer.setVisibility(View.GONE);
-                    layoutBottomSheet.setVisibility(View.VISIBLE);
-                    JSONArray suggested = data.getJSONArray("suggested_videos");
-                    if (suggested.length() != 0) {
-                        suggestions.clear();
-                    }
-                    for (int i = 0; i < suggested.length(); i++) {
-                        try {
-                            JSONObject object = suggested.getJSONObject(i);
-                            JSONObject suggested_owner = object.getJSONObject("owner");
-                            MainPageItems pageItems = new MainPageItems();
-                            pageItems.setPreview_image(object.getString("thumbnail"));
-                            pageItems.setChannel_name(suggested_owner.getString("first_name"));
-                            pageItems.setDays(object.getString("time_ago"));
-                            pageItems.setDuration(object.getString("duration"));
-                            pageItems.setName(object.getString("title"));
-                            pageItems.setViews(object.getString("views"));
-                            pageItems.setUrl(object.getString("video_location"));
-                            pageItems.setId(object.getString("video_id"));
-                            suggestions.add(pageItems);
-                            panelAdapter = new PanelAdapter(suggestions, MainActivity.this, itemSelecListener);
-                            recyclerInPanel.setAdapter(panelAdapter);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    if (suggestions.size() != 0) {
-                        addSuggestion(suggestions.get(0).getUrl());
-                    }
-                    if (data_uri != null) {
-                        data_uri = null;
-                        waterUrl = url_of_data;
-                        releasePlayer();
-                        initPlayer();
-                        panel.maximize();
-                        lastPosition = position;
-                    }
-                    //       addSuggestion(suggestions.get(0).getUrl());
-                } catch (JSONException e) {
-                    e.printStackTrace();
                 }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                error.printStackTrace(); //log the error resulting from the request for diagnosis/debugging
-                try {
-                    requstByVideo(id);
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                if (data.getString("is_subscribed").equals("1")) {
+                    follow.setText("Подписка");
+                    followed = true;
+                } else {
+                    follow.setText("подписаться");
+                    followed = false;
                 }
-            }
-        }) {
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> postMap = new HashMap<>();
-                postMap.put("server_key", "e39111734a4e6a21dd442887dd5112c8");
-                if (logedIn) {
-                    if (pref.getString("session", null) != null) {
-                        postMap.put("s", pref.getString("session", null));
-                        postMap.put("user_id", pref.getString("userId", null));
+                quality_has.clear();
+                quality_has.add("Авто");
+                for (int i = 0; i < quality.size(); i++) {
+                    if (data.getString(quality.get(i))!=null) {
+                        quality_has.add(quality.get(i));
                     }
                 }
-                return postMap;
+                initQuality();
+                progressBar.setVisibility(View.GONE);
+                bottom_constraint.setVisibility(View.VISIBLE);
+                shimmer.setVisibility(View.GONE);
+                layoutBottomSheet.setVisibility(View.VISIBLE);
             }
-        };
-        Volley.newRequestQueue(MainActivity.this).add(stringRequest);
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.wtf("asda", e.getMessage());
+            }
+        });
     }
+//    private void requstByVideo(String id) throws JSONException {
+//
+//        String requestUrl = "https://video.orzu.org/api/v1.0/?type=get_video_details&video_id=" + id;
+//        StringRequest stringRequest = new StringRequest(Request.Method.POST, requestUrl, new Response.Listener<String>() {
+//            @Override
+//            public void onResponse(String response) {
+//                try {
+//
+//                    JSONObject j = new JSONObject(response);
+//                    JSONObject data = j.getJSONObject("data");
+//                    JSONObject owner = data.getJSONObject("owner");
+//                    name.setText(data.getString("title"));
+//                    views.setText(data.getString("views"));
+//                    likes.setText(data.getString("likes"));
+//                    dislikes.setText(data.getString("dislikes"));
+//                    channel_name.setText(owner.getString("first_name"));
+//                    channel_names.setText(owner.getString("first_name"));
+//                    name_of_video.setText(data.getString("title"));
+//                    Picasso.get().load(owner.getString("avatar")).into(channel_logo);
+//                    channel_id = owner.getString("id");
+//                    followers.setText(data.getString("dislikes"));
+//                    date.setText(data.getString("time_alpha"));
+//                    name_of_video_bottom.setText(data.getString("title"));
+//                    name_of_category.setText(data.getString("category_name"));
+//                    url_of_data = data.getString("video_location");
+//
+//                    if (data.getString("is_liked").equals("1")) {
+//                        like.setImageResource(R.drawable.ic_favorite_blue);
+//                    } else
+//                        like.setImageResource(R.drawable.ic_favorite_black);
+//                    if (data.getString("is_disliked").equals("1")) {
+//
+//                    } else {
+//
+//                    }
+//                    if (data.getString("is_subscribed").equals("1")) {
+//                        follow.setText("Подписка");
+//                        followed = true;
+//                    } else {
+//                        follow.setText("подписаться");
+//                        followed = false;
+//                    }
+//                    quality_has.clear();
+//                    quality_has.add("Авто");
+//                    for (int i = 0; i < quality.size(); i++) {
+//                        if (data.getString(quality.get(i)).equals("1")) {
+//                            quality_has.add(quality.get(i));
+//                        }
+//                    }
+//                    initQuality();
+//                    progressBar.setVisibility(View.GONE);
+//                    bottom_constraint.setVisibility(View.VISIBLE);
+//                    shimmer.setVisibility(View.GONE);
+//                    layoutBottomSheet.setVisibility(View.VISIBLE);
+//                    JSONArray suggested = data.getJSONArray("suggested_videos");
+//                    if (suggested.length() != 0) {
+//                        suggestions.clear();
+//                    }
+//                    for (int i = 0; i < suggested.length(); i++) {
+//                        try {
+//                            JSONObject object = suggested.getJSONObject(i);
+//                            JSONObject suggested_owner = object.getJSONObject("owner");
+//                            MainPageItems pageItems = new MainPageItems();
+//                            pageItems.setPreview_image(object.getString("thumbnail"));
+//                            pageItems.setChannel_name(suggested_owner.getString("first_name"));
+//                            pageItems.setDays(object.getString("time_ago"));
+//                            pageItems.setDuration(object.getString("duration"));
+//                            pageItems.setName(object.getString("title"));
+//                            pageItems.setViews(object.getString("views"));
+//                            pageItems.setUrl(object.getString("video_location"));
+//                            pageItems.setId(object.getString("video_id"));
+//                            suggestions.add(pageItems);
+//                            panelAdapter = new PanelAdapter(suggestions, MainActivity.this, itemSelecListener);
+//                            recyclerInPanel.setAdapter(panelAdapter);
+//                        } catch (JSONException e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                    if (suggestions.size() != 0) {
+//                        addSuggestion(suggestions.get(0).getUrl());
+//                    }
+//                    if (data_uri != null) {
+//                        data_uri = null;
+//                        waterUrl = url_of_data;
+//                        releasePlayer();
+//                        initPlayer();
+//                        panel.maximize();
+//                        lastPosition = position;
+//                    }
+//                    //       addSuggestion(suggestions.get(0).getUrl());
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }, new Response.ErrorListener() {
+//            @Override
+//            public void onErrorResponse(VolleyError error) {
+//                error.printStackTrace(); //log the error resulting from the request for diagnosis/debugging
+//                try {
+//                    requstByVideo(id);
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }) {
+//            @Override
+//            protected Map<String, String> getParams() throws AuthFailureError {
+//                Map<String, String> postMap = new HashMap<>();
+//                postMap.put("server_key", "e39111734a4e6a21dd442887dd5112c8");
+//                if (logedIn) {
+//                    if (pref.getString("session", null) != null) {
+//                        postMap.put("s", pref.getString("session", null));
+//                        postMap.put("user_id", pref.getString("userId", null));
+//                    }
+//                }
+//                return postMap;
+//            }
+//        };
+//        Volley.newRequestQueue(MainActivity.this).add(stringRequest);
+//    }
 
     private void initQuality() {
 
@@ -1605,7 +1665,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             try {
                 requstByVideo(ids.get(ids.size() - margin));
                 player.setPlayWhenReady(true);
-            } catch (JSONException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }

@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import androidx.fragment.app.Fragment;
@@ -33,8 +34,19 @@ import com.example.videoplayer.Interfaces.ItemSelecListener;
 import com.example.videoplayer.Activities.MainActivity;
 import com.example.videoplayer.Layouts.ExoPlayerRecyclerView;
 import com.example.videoplayer.Models.MainPageItems;
+import com.example.videoplayer.Models.Video;
 import com.example.videoplayer.R;
 import com.facebook.shimmer.ShimmerFrameLayout;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -54,6 +66,7 @@ public class MainFragment extends Fragment implements ItemSelecListener, SwipeRe
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private int count = 0;
     private SharedPreferences pref;
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -78,6 +91,7 @@ public class MainFragment extends Fragment implements ItemSelecListener, SwipeRe
         Log.wtf("postiontion", items.size() + "");
         shimmer = (ShimmerFrameLayout) v.findViewById(R.id.shimmer_view_container);
         shimmer.startShimmer();
+        getDataFirebase();
         recyclerView = v.findViewById(R.id.recycler);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mSwipeRefreshLayout = v.findViewById(R.id.swipe_container);
@@ -86,7 +100,7 @@ public class MainFragment extends Fragment implements ItemSelecListener, SwipeRe
                 android.R.color.holo_green_dark,
                 android.R.color.holo_orange_dark,
                 android.R.color.holo_blue_dark);
-        adapter = new MediaRecyclerAdapter(getContext(),items, initGlide(), this);
+        adapter = new MediaRecyclerAdapter(getContext(), items, initGlide(), this);
         items.clear();
         adapter.notifyDataSetChanged();
         recyclerView.setAdapter(adapter);
@@ -105,8 +119,8 @@ public class MainFragment extends Fragment implements ItemSelecListener, SwipeRe
             @Override
             public void run() {
                 try {
-                    sendWorkPostRequest();
-                } catch (JSONException e) {
+                    getDataFirebase();
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
                 if (mSwipeRefreshLayout != null & count == 0) {
@@ -123,6 +137,26 @@ public class MainFragment extends Fragment implements ItemSelecListener, SwipeRe
         return v;
     }
 
+    public void getDataFirebase() {
+
+        db.collection("Videos").document("1").get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                MainPageItems itemss = documentSnapshot.toObject(MainPageItems.class);
+                adapter.notifyDataSetChanged();
+                mSwipeRefreshLayout.setRefreshing(false);
+                items.add(itemss);
+                recyclerView.setMediaObjects(items);
+                shimmer.setVisibility(View.GONE);
+                recyclerView.setVisibility(View.VISIBLE);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.wtf("asda", e.getMessage());
+            }
+        });
+    }
 
     @Override
     public void onStop() {
@@ -133,7 +167,7 @@ public class MainFragment extends Fragment implements ItemSelecListener, SwipeRe
 
     @Override
     public void onDestroy() {
-        Log.wtf("mainfragment","destroyed");
+        Log.wtf("mainfragment", "destroyed");
         super.onDestroy();
     }
 
@@ -236,9 +270,10 @@ public class MainFragment extends Fragment implements ItemSelecListener, SwipeRe
             recyclerView.setVisibility(View.GONE);
             count++;
             items.clear();
-            sendWorkPostRequest();
+            //sendWorkPostRequest();
+            getDataFirebase();
             adapter.notifyDataSetChanged();
-        } catch (JSONException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

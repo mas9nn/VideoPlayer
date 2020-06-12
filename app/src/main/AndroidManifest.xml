@@ -43,7 +43,7 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:host="video.orzu.org"
+                    android:host="firebasestorage.googleapis.com"
                     android:scheme="https" />
             </intent-filter>
         </activity>
